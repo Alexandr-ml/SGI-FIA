@@ -7,4 +7,74 @@
     android:layout_height="match_parent"
     tools:context=".controller.MenuActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="409dp"
+        android:layout_height="729dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="173dp"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="178dp"
+            android:text="Acciones"
+            android:textSize="34sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="407dp"
+            android:layout_height="630dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="1dp"
+            tools:layout_editor_absoluteY="98dp">
+
+            <Button
+                android:id="@+id/btnNuevoEquipoInformatico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nuevo equipo informatico" />
+
+            <Button
+                android:id="@+id/btnNuevoLibro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nuevo libro" />
+
+            <Button
+                android:id="@+id/btnNuevaTesis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nueva tesis" />
+
+            <Button
+                android:id="@+id/btnPrestamoPorHoras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prestamo de equipo informatico por horas/actividad" />
+
+            <Button
+                android:id="@+id/btnPrestamoRecurrente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prestamo recurrente de equipo informatico" />
+
+            <Button
+                android:id="@+id/btnLevantamientoFisico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Levantamiendo fisico" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
