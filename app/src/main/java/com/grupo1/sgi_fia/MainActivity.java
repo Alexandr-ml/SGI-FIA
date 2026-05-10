@@ -11,6 +11,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.grupo1.sgi_fia.controller.MenuActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     Button btnIniciarSesion;
@@ -31,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
         btnIniciarSesion.setOnClickListener((view)->{
 
-            Intent menu = new Intent();
-
+            Intent menu = new Intent(this, MenuActivity.class);
+            startActivity(menu);
 
                 }
         );
