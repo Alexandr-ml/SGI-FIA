@@ -78,7 +78,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "fecha_devolucion TEXT, " +
                 "FOREIGN KEY(id_prestamo) REFERENCES prestamos(id_prestamo))");
 
-        // 7. 🌟 NUEVA TABLA: Sustituciones (Historial de cambios por daño o renovación)
+        // Sustituciones (Historial de cambios por daño o renovación)
         db.execSQL("CREATE TABLE sustituciones (" +
                 "id_sustitucion INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_hardware_viejo INTEGER, " +
@@ -88,7 +88,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(id_hardware_viejo) REFERENCES hardware(id_hardware), " +
                 "FOREIGN KEY(id_hardware_nuevo) REFERENCES hardware(id_hardware))");
 
-        // 8. 🌟 NUEVA TABLA: Auditorías (Para el Levantamiento Físico Anual y Faltantes)
+        // Auditorías (Para el Levantamiento Físico Anual y Faltantes)
         db.execSQL("CREATE TABLE auditorias (" +
                 "id_auditoria INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_hardware INTEGER, " +

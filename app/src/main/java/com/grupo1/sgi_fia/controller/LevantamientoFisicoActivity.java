@@ -48,6 +48,13 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         txtResumen = findViewById(R.id.txt_resumen_auditoria);
         radioGroupEstado = findViewById(R.id.radio_group_estado_auditoria);
 
+        // 🔥 Forzar que los componentes respondan a los toques del dedo
+        spinnerPeriodo.setFocusable(true);
+        spinnerPeriodo.setClickable(true);
+        spinnerUbicacion.setFocusable(true);
+        spinnerUbicacion.setClickable(true);
+        radioGroupEstado.setFocusable(true);
+
         Button btnRegresar = findViewById(R.id.btn_regresar_auditoria);
         Button btnGuardar = findViewById(R.id.btn_guardar_auditoria);
 
