@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Levantamiento Físico Anual"
+            android:textColor="#1A1A1A"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="2dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auditoría de activos y control de faltantes (FIA):"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:orientation="vertical"
+                android:layout_marginRight="4dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Año Periodo"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="2dp"/>
+                <Spinner
+                    android:id="@+id/spinner_periodo_auditoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:orientation="vertical"
+                android:layout_marginLeft="4dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ubicación a Revisar"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="2dp"/>
+                <Spinner
+                    android:id="@+id/spinner_ubicacion_auditoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Buscar Equipo (ID o Número de Serie)"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+
+        <EditText
+            android:id="@+id/edit_buscar_auditoria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Digite serie o toque para buscar..."
+            android:textSize="13sp"
+            android:background="@android:drawable/edit_text"
+            android:paddingLeft="8dp"
+            android:importantForAutofill="no"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:padding="10dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/txt_info_equipo_auditoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Detalles del Equipo:\nEsperando búsqueda de activo..."
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp"/>
+
+            <RadioGroup
+                android:id="@+id/radio_group_estado_auditoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/radio_encontrado"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Encontrado"
+                    android:textSize="13sp"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/radio_no_encontrado"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="No Encontrado"
+                    android:textColor="#D32F2F"
+                    android:textSize="13sp"/>
+            </RadioGroup>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Observaciones / Notas"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+
+        <EditText
+            android:id="@+id/edit_observaciones_auditoria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Ej: Se encontró en otra oficina / Dañado"
+            android:textSize="13sp"
+            android:importantForAutofill="no"
+            android:background="@android:drawable/edit_text"
+            android:paddingLeft="8dp"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/txt_resumen_auditoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resumen: Auditados: 0 | Restantes: 0 | Faltantes: 0"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btn_regresar_auditoria"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Regresar"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#333333"
+                android:layout_marginRight="4dp"/>
+
+            <Button
+                android:id="@+id/btn_guardar_auditoria"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Guardar Registro"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#D32F2F"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

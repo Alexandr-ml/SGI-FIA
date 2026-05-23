@@ -23,9 +23,9 @@ public class DevolucionLibroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Vinculo la actividad con el archivo de diseño XML de devoluciones
-        setContentView(R.layout.activity_devolucion_libro);// OJO: Verifica si tu XML se llama exactamente así
+        setContentView(R.layout.activity_devolucion_libro);
 
-        // 2. Mapéo las variables de Java con las referencias de los objetos en el archivo XML
+        // 2. Mapeo las variables de Java con las referencias de los objetos en el archivo XML
         etIdPrestamo = findViewById(R.id.etIdPrestamo);
         cbMarcarDevuelto = findViewById(R.id.cbMarcarDevuelto);
         etFechaDevolucion = findViewById(R.id.etFechaDevolucion);
@@ -49,44 +49,70 @@ public class DevolucionLibroActivity extends AppCompatActivity {
         });
     }
 
-    // 5. Método técnico para la inserción del estado de devolución en la base de datos local
+    // 5. Método técnico para procesar la devolución e impactar tanto la tabla devoluciones como prestamos
     private void registrarDevolucion() {
         // Inicializo el helper del motor de SQLite y abro la base de datos en modo escritura
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "Biblioteca.db", null, 1);
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "Biblioteca.db", null, 3);
         SQLiteDatabase bd = admin.getWritableDatabase();
 
-        // Extraigo los valores de las entradas de texto
-        String idPrestamo = etIdPrestamo.getText().toString();
-        String fechaDevolucion = etFechaDevolucion.getText().toString();
+        // Extraigo los valores de las entradas de texto limpios de espacios extras
+        String idPrestamoStr = etIdPrestamo.getText().toString().trim();
+        String fechaDevolucion = etFechaDevolucion.getText().toString().trim();
 
         // Convierto el estado booleano del CheckBox a un tipo entero compatible con SQLite (1 = True, 0 = False)
         int estadoDevuelto = cbMarcarDevuelto.isChecked() ? 1 : 0;
 
-        // Validación condicional para certificar que el campo clave de búsqueda no esté vacío
-        if (!idPrestamo.isEmpty() && !fechaDevolucion.isEmpty()) {
+        // Validación condicional: El ID de préstamo, la fecha y el check de confirmación son necesarios
+        if (!idPrestamoStr.isEmpty() && !fechaDevolucion.isEmpty()) {
 
-            // Instancio el contenedor de datos estructurados para la consulta
-            ContentValues registro = new ContentValues();
+            if (estadoDevuelto == 1) {
+                try {
+                    int idPrestamo = Integer.parseInt(idPrestamoStr);
 
-            // Enlazo las variables extraídas con los nombres de columna de la tabla "devoluciones"
-            registro.put("id_prestamo", idPrestamo);
-            registro.put("marcar_devuelto", estadoDevuelto);
-            registro.put("fecha_devolucion", fechaDevolucion);
+                    // =========================================================================
+                    // PASO A: Insertar el registro histórico en la tabla "devoluciones"
+                    // =========================================================================
+                    ContentValues registroDevolucion = new ContentValues();
+                    registroDevolucion.put("id_prestamo", idPrestamo); // Como entero para la FK
+                    registroDevolucion.put("marcar_devuelto", estadoDevuelto);
+                    registroDevolucion.put("fecha_devolucion", fechaDevolucion);
 
-            // Ejecuto la sentencia de inserción en la base de datos y cierro la instancia de conexión
-            bd.insert("devoluciones", null, registro);
-            bd.close();
+                    bd.insert("devoluciones", null, registroDevolucion);
 
-            // Restablezco los componentes visuales a su estado inicial por defecto
-            etIdPrestamo.setText("");
-            etFechaDevolucion.setText("");
-            cbMarcarDevuelto.setChecked(false);
+                    // =========================================================================
+                    // PASO B: EL TRUCO DE LÓGICA. Actualizar el estado en la tabla "prestamos"
+                    // =========================================================================
+                    ContentValues valoresPrestamo = new ContentValues();
+                    valoresPrestamo.put("estado", "Devuelto"); // Cambiamos el estado de 'Pendiente' a 'Devuelto'
 
-            // Despliego una notificación temporal Toast confirmando la persistencia de los datos
-            Toast.makeText(this, "¡Devolución registrada con éxito!", Toast.LENGTH_SHORT).show();
+                    // Aplicamos el UPDATE filtrando estrictamente por el ID de este préstamo
+                    int filasActualizadas = bd.update("prestamos", valoresPrestamo, "id_prestamo = ?", new String[]{String.valueOf(idPrestamo)});
+
+                    bd.close(); // Cerramos la conexión
+
+                    // Restablezco los componentes visuales a su estado inicial por defecto
+                    etIdPrestamo.setText("");
+                    etFechaDevolucion.setText("");
+                    cbMarcarDevuelto.setChecked(false);
+
+                    if (filasActualizadas > 0) {
+                        Toast.makeText(this, "¡Devolución registrada y préstamo cerrado con éxito!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Alerta por si digitan un ID de préstamo que no existe en el inventario
+                        Toast.makeText(this, "Devolución guardada, pero el ID de préstamo no existía en el registro.", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "El ID de préstamo debe ser un número válido", Toast.LENGTH_SHORT).show();
+                    bd.close();
+                }
+            } else {
+                Toast.makeText(this, "Por favor, marque la casilla 'Marcar como devuelto' para confirmar", Toast.LENGTH_SHORT).show();
+                bd.close();
+            }
         } else {
-            // Manejo de excepción visual si las condiciones de validación primaria fallan
             Toast.makeText(this, "Por favor, complete el ID de préstamo y la fecha", Toast.LENGTH_SHORT).show();
+            bd.close();
         }
     }
 }
