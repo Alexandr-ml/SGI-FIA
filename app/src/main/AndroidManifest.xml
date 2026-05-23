@@ -12,12 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SGIFIA">
         <activity
-            android:name=".controller.PrestamoTesisActivity"
-            android:exported="false" />
-        <activity
-            android:name=".controller.PrestamoEquipoPorHorasActivity"
-            android:exported="false" />
-        <activity
             android:name=".controller.PrestamoDeEquipoRecurrente"
             android:exported="false" />
         <activity
