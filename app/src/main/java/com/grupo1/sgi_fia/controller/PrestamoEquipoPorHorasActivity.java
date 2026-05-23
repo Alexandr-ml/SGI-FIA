@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.model.EquiposRegistrados;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -52,7 +53,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private void registrarPrestamo() {
         String nombre = obtenerTexto(etNombrePrestatario);
         String carnet = "N/A";
-        String equipo = "Monitor Dell S2725HSM; Impresora HP Smart Tank 580";
+        String equipo = EquiposRegistrados.obtenerListadoParaPrestamo();
         String fecha = obtenerTexto(etFechaPrestamo);
         String horaInicio = obtenerTexto(etHoraInicio);
         String horaFin = obtenerTexto(etHoraFin);
