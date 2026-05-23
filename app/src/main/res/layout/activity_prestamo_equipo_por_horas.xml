@@ -39,18 +39,20 @@
             android:textColor="#333333"
             android:textSize="10sp" />
 
-        <Button
+        <TextView
             android:id="@+id/btnBuscarPrestatarioEquipo"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_button_dark_compact"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="Buscar prestatario"
-            android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="10sp" />
 
@@ -244,18 +246,20 @@
             </LinearLayout>
         </LinearLayout>
 
-        <Button
+        <TextView
             android:id="@+id/btnAnadirEquipoPrestamo"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginTop="6dp"
             android:background="@drawable/bg_button_dark_compact"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingStart="13dp"
             android:paddingEnd="13dp"
             android:text="Anadir"
-            android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="10sp" />
 
@@ -270,33 +274,37 @@
             android:gravity="bottom"
             android:orientation="horizontal">
 
-            <Button
+            <TextView
                 android:id="@+id/btnRegistrarPrestamoEquipo"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="11dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_dark_compact"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
                 android:minHeight="0dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:text="Registrar prestamo"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="9sp" />
 
-            <Button
+            <TextView
                 android:id="@+id/btnCancelarPrestamoEquipo"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="11dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_red_compact"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
                 android:minHeight="0dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:text="Cancelar"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="9sp" />
         </LinearLayout>

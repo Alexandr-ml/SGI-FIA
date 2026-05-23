@@ -4,7 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -32,9 +32,9 @@ public class PrestamoTesisActivity extends AppCompatActivity {
         etTituloTesis = findViewById(R.id.etTituloTesis);
         etFechaPrestamo = findViewById(R.id.etFechaPrestamoTesis);
         etFechaDevolucion = findViewById(R.id.etFechaDevolucionTesis);
-        Button btnRegistrar = findViewById(R.id.btnRegistrarPrestamoTesis);
-        Button btnCancelar = findViewById(R.id.btnCancelarPrestamoTesis);
-        Button btnBuscarPrestatario = findViewById(R.id.btnBuscarPrestatarioTesis);
+        View btnRegistrar = findViewById(R.id.btnRegistrarPrestamoTesis);
+        View btnCancelar = findViewById(R.id.btnCancelarPrestamoTesis);
+        View btnBuscarPrestatario = findViewById(R.id.btnBuscarPrestatarioTesis);
 
         etFechaPrestamo.setOnClickListener(view -> mostrarSelectorFecha(etFechaPrestamo));
         etFechaDevolucion.setOnClickListener(view -> mostrarSelectorFecha(etFechaDevolucion));

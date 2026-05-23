@@ -5,7 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -33,10 +33,10 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         etFechaPrestamo = findViewById(R.id.etFechaPrestamoEquipo);
         etHoraInicio = findViewById(R.id.etHoraInicioEquipo);
         etHoraFin = findViewById(R.id.etHoraFinEquipo);
-        Button btnRegistrar = findViewById(R.id.btnRegistrarPrestamoEquipo);
-        Button btnCancelar = findViewById(R.id.btnCancelarPrestamoEquipo);
-        Button btnBuscarPrestatario = findViewById(R.id.btnBuscarPrestatarioEquipo);
-        Button btnAnadirEquipo = findViewById(R.id.btnAnadirEquipoPrestamo);
+        View btnRegistrar = findViewById(R.id.btnRegistrarPrestamoEquipo);
+        View btnCancelar = findViewById(R.id.btnCancelarPrestamoEquipo);
+        View btnBuscarPrestatario = findViewById(R.id.btnBuscarPrestatarioEquipo);
+        View btnAnadirEquipo = findViewById(R.id.btnAnadirEquipoPrestamo);
 
         etFechaPrestamo.setOnClickListener(view -> mostrarSelectorFecha(etFechaPrestamo));
         etHoraInicio.setOnClickListener(view -> mostrarSelectorHora(etHoraInicio));
