@@ -32,6 +32,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private EditText etHoraFin;
     private LinearLayout contenedorEquipos;
     private final List<String> equiposRegistrados = new ArrayList<>();
+    private final List<String> equiposSeleccionados = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +57,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         btnCancelar.setOnClickListener(view -> finish());
         btnBuscarPrestatario.setOnClickListener(view ->
                 Toast.makeText(this, "Busqueda de prestatario", Toast.LENGTH_SHORT).show());
-        btnAnadirEquipo.setOnClickListener(view ->
-                Toast.makeText(this, "Equipo agregado al prestamo", Toast.LENGTH_SHORT).show());
+        btnAnadirEquipo.setOnClickListener(view -> confirmarEquiposSeleccionados());
     }
 
     private void registrarPrestamo() {
@@ -70,8 +70,13 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         String actividad = "Prestamo por horas";
         String observaciones = "";
 
-        if (equipo.isEmpty()) {
+        if (equiposRegistrados.isEmpty()) {
             Toast.makeText(this, "No hay equipos registrados", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (equipo.isEmpty()) {
+            Toast.makeText(this, "Seleccione al menos un equipo", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -142,6 +147,8 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         etFechaPrestamo.setText("");
         etHoraInicio.setText("");
         etHoraFin.setText("");
+        equiposSeleccionados.clear();
+        cargarEquiposRegistrados();
     }
 
     private void cargarEquiposRegistrados() {
@@ -162,23 +169,26 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
             String nombre = cursor.getString(0);
             String modelo = cursor.getString(1);
             String modeloFormateado = formatearModelo(modelo);
-            equiposRegistrados.add(nombre + " - " + modeloFormateado);
-            contenedorEquipos.addView(crearFilaEquipo(nombre, modeloFormateado));
+            String equipo = nombre + " - " + modeloFormateado;
+            equiposRegistrados.add(equipo);
+            contenedorEquipos.addView(crearFilaEquipo(nombre, modeloFormateado, equipo));
         }
 
         cursor.close();
         db.close();
 
         if (equiposRegistrados.isEmpty()) {
-            contenedorEquipos.addView(crearFilaEquipo("Sin equipos registrados", "Revise SGIFIA.db"));
+            contenedorEquipos.addView(crearFilaEquipo("Sin equipos registrados", "Revise SGIFIA.db", ""));
         }
     }
 
-    private View crearFilaEquipo(String nombre, String modelo) {
+    private View crearFilaEquipo(String nombre, String modelo, String equipo) {
         LinearLayout fila = new LinearLayout(this);
         fila.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(34)));
+        fila.setClickable(!equipo.isEmpty());
+        fila.setFocusable(!equipo.isEmpty());
         fila.setGravity(Gravity.CENTER_VERTICAL);
         fila.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -212,7 +222,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
                 dp(18),
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         flecha.setGravity(Gravity.END);
-        flecha.setText(">");
+        flecha.setText(equiposSeleccionados.contains(equipo) ? "\u2713" : ">");
         flecha.setTextColor(Color.parseColor("#1A1A1A"));
         flecha.setTextSize(14);
 
@@ -220,14 +230,17 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         textos.addView(subtitulo);
         fila.addView(textos);
         fila.addView(flecha);
+
+        if (!equipo.isEmpty()) {
+            aplicarEstadoFilaEquipo(fila, flecha, equipo);
+            fila.setOnClickListener(view -> cambiarSeleccionEquipo(fila, flecha, equipo));
+        }
+
         return fila;
     }
 
     private String obtenerListadoEquiposParaPrestamo() {
-        if (equiposRegistrados.isEmpty()) {
-            cargarEquiposRegistrados();
-        }
-        return String.join("; ", equiposRegistrados);
+        return String.join("; ", equiposSeleccionados);
     }
 
     private String formatearModelo(String modelo) {
@@ -239,5 +252,28 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
 
     private int dp(int valor) {
         return (int) (valor * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    private void cambiarSeleccionEquipo(LinearLayout fila, TextView indicador, String equipo) {
+        if (equiposSeleccionados.contains(equipo)) {
+            equiposSeleccionados.remove(equipo);
+        } else {
+            equiposSeleccionados.add(equipo);
+        }
+        aplicarEstadoFilaEquipo(fila, indicador, equipo);
+    }
+
+    private void aplicarEstadoFilaEquipo(LinearLayout fila, TextView indicador, String equipo) {
+        boolean seleccionado = equiposSeleccionados.contains(equipo);
+        fila.setBackgroundColor(seleccionado ? Color.parseColor("#EEF2F6") : Color.TRANSPARENT);
+        indicador.setText(seleccionado ? "\u2713" : ">");
+    }
+
+    private void confirmarEquiposSeleccionados() {
+        if (equiposSeleccionados.isEmpty()) {
+            Toast.makeText(this, "Seleccione al menos un equipo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Equipo agregado al prestamo", Toast.LENGTH_SHORT).show();
     }
 }
