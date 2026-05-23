@@ -1,12 +1,16 @@
 package com.grupo1.sgi_fia.controller;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
@@ -14,105 +18,109 @@ import com.grupo1.sgi_fia.R;
 
 public class DevolucionLibroActivity extends AppCompatActivity {
 
-    // 1. Defino las variables globales para los componentes de control de la devolución
+    private Spinner spinnerTipoDocumento;
     private EditText etIdPrestamo, etFechaDevolucion;
     private CheckBox cbMarcarDevuelto;
     private Button btnRegistrar, btnCancelar;
+    private AdminSQLiteOpenHelper adminHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Vinculo la actividad con el archivo de diseño XML de devoluciones
         setContentView(R.layout.activity_devolucion_libro);
 
-        // 2. Mapeo las variables de Java con las referencias de los objetos en el archivo XML
+        // Inicializar Base de Datos con tu nombre y versión exacta (Biblioteca.db, versión 3)
+        adminHelper = new AdminSQLiteOpenHelper(this, "Biblioteca.db", null, 3);
+
+        // Vincular vistas
+        spinnerTipoDocumento = findViewById(R.id.spinnerTipoDocumento);
         etIdPrestamo = findViewById(R.id.etIdPrestamo);
-        cbMarcarDevuelto = findViewById(R.id.cbMarcarDevuelto);
         etFechaDevolucion = findViewById(R.id.etFechaDevolucion);
+        cbMarcarDevuelto = findViewById(R.id.cbMarcarDevuelto);
         btnRegistrar = findViewById(R.id.btnRegistrarDevolucion);
         btnCancelar = findViewById(R.id.btnCancelarDevolucion);
 
-        // 3. Configuro el evento click para procesar el guardado de la devolución
-        btnRegistrar.setOnClickListener(new View.OnClickListener() {
+        // Configurar las opciones del Spinner (Libro / Tesis)
+        String[] opciones = {"Libro", "Tesis"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, opciones);
+        spinnerTipoDocumento.setAdapter(adapter);
+
+        // Cambiar dinámicamente el texto del CheckBox según la selección
+        spinnerTipoDocumento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                registrarDevolucion();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String seleccion = opciones[position];
+                cbMarcarDevuelto.setText("Marcar " + seleccion.toLowerCase() + " como devuelto");
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 4. Configuro el botón Cancelar para finalizar la actividad y liberar la pila de ejecución
-        btnCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        // Botón Cancelar (Cierra la pantalla de forma limpia)
+        btnCancelar.setOnClickListener(v -> finish());
+
+        // Botón Registrar
+        btnRegistrar.setOnClickListener(v -> ejecutarDevolucion());
     }
 
-    // 5. Método técnico para procesar la devolución e impactar tanto la tabla devoluciones como prestamos
-    private void registrarDevolucion() {
-        // Inicializo el helper del motor de SQLite y abro la base de datos en modo escritura
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "Biblioteca.db", null, 3);
-        SQLiteDatabase bd = admin.getWritableDatabase();
+    private void ejecutarDevolucion() {
+        String idPrestamo = etIdPrestamo.getText().toString().trim();
+        String fecha = etFechaDevolucion.getText().toString().trim();
+        String tipoDoc = spinnerTipoDocumento.getSelectedItem().toString();
+        boolean estaChequeado = cbMarcarDevuelto.isChecked();
 
-        // Extraigo los valores de las entradas de texto limpios de espacios extras
-        String idPrestamoStr = etIdPrestamo.getText().toString().trim();
-        String fechaDevolucion = etFechaDevolucion.getText().toString().trim();
+        // Validaciones obligatorias
+        if (idPrestamo.isEmpty()) {
+            Toast.makeText(this, "⚠️ Por favor, ingresa el ID del préstamo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (fecha.isEmpty()) {
+            Toast.makeText(this, "⚠️ Por favor, ingresa la fecha de devolución", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!estaChequeado) {
+            Toast.makeText(this, "⚠️ Debes marcar la casilla para confirmar la devolución", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Convierto el estado booleano del CheckBox a un tipo entero compatible con SQLite (1 = True, 0 = False)
-        int estadoDevuelto = cbMarcarDevuelto.isChecked() ? 1 : 0;
+        SQLiteDatabase db = adminHelper.getWritableDatabase();
 
-        // Validación condicional: El ID de préstamo, la fecha y el check de confirmación son necesarios
-        if (!idPrestamoStr.isEmpty() && !fechaDevolucion.isEmpty()) {
+        try {
+            //  Verificar si el ID de préstamo coincide con el tipo elegido (Libro o Tesis)
+            String queryValidar = "SELECT p.id_prestamo FROM prestamos p " +
+                    "INNER JOIN documentos d ON p.id_documento = d.id_documento " +
+                    "WHERE p.id_prestamo = ? AND d.tipo = ?";
 
-            if (estadoDevuelto == 1) {
-                try {
-                    int idPrestamo = Integer.parseInt(idPrestamoStr);
+            Cursor cursor = db.rawQuery(queryValidar, new String[]{idPrestamo, tipoDoc});
 
-                    // =========================================================================
-                    // PASO A: Insertar el registro histórico en la tabla "devoluciones"
-                    // =========================================================================
-                    ContentValues registroDevolucion = new ContentValues();
-                    registroDevolucion.put("id_prestamo", idPrestamo); // Como entero para la FK
-                    registroDevolucion.put("marcar_devuelto", estadoDevuelto);
-                    registroDevolucion.put("fecha_devolucion", fechaDevolucion);
-
-                    bd.insert("devoluciones", null, registroDevolucion);
-
-                    // =========================================================================
-                    // PASO B: EL TRUCO DE LÓGICA. Actualizar el estado en la tabla "prestamos"
-                    // =========================================================================
-                    ContentValues valoresPrestamo = new ContentValues();
-                    valoresPrestamo.put("estado", "Devuelto"); // Cambiamos el estado de 'Pendiente' a 'Devuelto'
-
-                    // Aplicamos el UPDATE filtrando estrictamente por el ID de este préstamo
-                    int filasActualizadas = bd.update("prestamos", valoresPrestamo, "id_prestamo = ?", new String[]{String.valueOf(idPrestamo)});
-
-                    bd.close(); // Cerramos la conexión
-
-                    // Restablezco los componentes visuales a su estado inicial por defecto
-                    etIdPrestamo.setText("");
-                    etFechaDevolucion.setText("");
-                    cbMarcarDevuelto.setChecked(false);
-
-                    if (filasActualizadas > 0) {
-                        Toast.makeText(this, "¡Devolución registrada y préstamo cerrado con éxito!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Alerta por si digitan un ID de préstamo que no existe en el inventario
-                        Toast.makeText(this, "Devolución guardada, pero el ID de préstamo no existía en el registro.", Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (NumberFormatException e) {
-                    Toast.makeText(this, "El ID de préstamo debe ser un número válido", Toast.LENGTH_SHORT).show();
-                    bd.close();
-                }
-            } else {
-                Toast.makeText(this, "Por favor, marque la casilla 'Marcar como devuelto' para confirmar", Toast.LENGTH_SHORT).show();
-                bd.close();
+            if (!cursor.moveToFirst()) {
+                Toast.makeText(this, "❌ El ID ingresado no corresponde a un préstamo de tipo: " + tipoDoc, Toast.LENGTH_LONG).show();
+                cursor.close();
+                db.close();
+                return;
             }
-        } else {
-            Toast.makeText(this, "Por favor, complete el ID de préstamo y la fecha", Toast.LENGTH_SHORT).show();
-            bd.close();
+            cursor.close();
+
+            // PASO 1: Cambiar el estado en la tabla 'prestamos' a 'Devuelto'
+            ContentValues valoresPrestamos = new ContentValues();
+            valoresPrestamos.put("estado", "Devuelto");
+            db.update("prestamos", valoresPrestamos, "id_prestamo = ?", new String[]{idPrestamo});
+
+            //  PASO 2: Insertar el registro en la tabla 'devoluciones'
+            ContentValues valoresDevoluciones = new ContentValues();
+            valoresDevoluciones.put("id_prestamo", Integer.parseInt(idPrestamo));
+            valoresDevoluciones.put("marcar_devuelto", 1); // 1 significa que sí está devuelto
+            valoresDevoluciones.put("fecha_devolucion", fecha);
+
+            db.insert("devoluciones", null, valoresDevoluciones);
+            db.close();
+
+            Toast.makeText(this, "✅ Devolución de " + tipoDoc + " guardada exitosamente", Toast.LENGTH_LONG).show();
+            finish(); // Cierra y regresa al menú principal
+
+        } catch (Exception e) {
+            Toast.makeText(this, "❌ Error en la base de datos: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

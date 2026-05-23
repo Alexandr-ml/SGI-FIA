@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:drawable/dialog_holo_light_frame"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp"
+    tools:ignore="HardcodedText">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/item_txt_serie"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Serie: ABC123XYZ"
+            android:textColor="#D32F2F"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_txt_estado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ENCONTRADO"
+            android:textColor="#2E7D32"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/item_txt_detalle_equipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Equipo: Dell Latitude | Resp: Ing. Juan Pérez"
+        android:textColor="#333333"
+        android:textSize="13sp"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/item_txt_ubicacion_periodo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lugar: Laboratorio L3 • Periodo 2026"
+        android:textColor="#666666"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/item_txt_observaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Obs: Sin novedades en el activo."
+        android:textColor="#757575"
+        android:textSize="12sp"
+        android:textStyle="italic" />
+
+</LinearLayout>

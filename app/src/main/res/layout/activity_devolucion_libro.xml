@@ -15,11 +15,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Devolucion de libro"
+            android:text="Devolución de Documentos"
             android:textColor="#1A1A1A"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="24dp"
             android:layout_marginTop="16dp"/>
 
         <TextView
@@ -29,12 +29,28 @@
             android:textColor="#1A1A1A"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="20dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Id de prestamo."
+            android:text="Tipo de documento a devolver:"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp"/>
+
+        <Spinner
+            android:id="@+id/spinnerTipoDocumento"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Id de préstamo."
             android:textColor="#333333"
             android:textSize="14sp"
             android:layout_marginBottom="6dp"/>
@@ -45,8 +61,8 @@
             android:layout_height="48dp"
             android:layout_marginBottom="24dp"
             android:background="@android:drawable/edit_text"
-            android:hint="id"
-            android:inputType="text"
+            android:hint="Ej. 102"
+            android:inputType="number"
             android:paddingLeft="12dp" />
 
         <LinearLayout
@@ -60,10 +76,11 @@
                 android:id="@+id/cbMarcarDevuelto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Marcar libro como devuelto"
+                android:text="Marcar como devuelto"
                 android:textSize="15sp"
                 android:textColor="#1A1A1A"
-                android:buttonTint="#10B981"/> </LinearLayout>
+                android:buttonTint="#10B981"/>
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -72,12 +89,13 @@
             android:textColor="#333333"
             android:textSize="14sp"
             android:layout_marginBottom="6dp"/>
+
         <EditText
             android:id="@+id/etFechaDevolucion"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@android:drawable/edit_text"
-            android:hint="25/07/2026"
+            android:hint="23/05/2026"
             android:paddingLeft="12dp"
             android:layout_marginBottom="40dp"
             android:inputType="date"
