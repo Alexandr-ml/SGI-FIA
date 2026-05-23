@@ -26,12 +26,6 @@
             android:name=".controller.DevolucionLibroActivity"
             android:exported="false" />
         <activity
-            android:name=".controller.AnadirEquipoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".controller.LevantamientoFisicoActivity"
-            android:exported="false" />
-        <activity
             android:name=".controller.MenuActivity"
             android:exported="false" />
         <activity

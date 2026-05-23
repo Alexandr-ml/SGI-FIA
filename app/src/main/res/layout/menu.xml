@@ -24,14 +24,6 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btnNuevoEquipoInformatico"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:minHeight="48dp"
-            android:text="Anadir nuevo equipo informatico" />
-
-        <Button
             android:id="@+id/btnNuevoLibro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,14 +62,6 @@
             android:layout_marginBottom="12dp"
             android:minHeight="56dp"
             android:text="Prestamo de tesis" />
-
-        <Button
-            android:id="@+id/btnLevantamientoFisico"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:minHeight="48dp"
-            android:text="Levantamiento fisico" />
 
         <Button
             android:id="@+id/btn_dev_libro"

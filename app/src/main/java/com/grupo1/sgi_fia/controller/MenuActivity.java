@@ -25,13 +25,11 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
-        configurarBoton(R.id.btnNuevoEquipoInformatico, AnadirEquipoActivity.class);
         configurarBoton(R.id.btnNuevoLibro, RegistroDocumentosActivity.class);
         configurarBoton(R.id.btnNuevaTesis, RegistroDocumentosActivity.class);
         configurarBoton(R.id.btnPrestamoPorHoras, PrestamoEquipoPorHorasActivity.class);
         configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
         configurarBoton(R.id.btnPrestamoTesis, PrestamoTesisActivity.class);
-        configurarBoton(R.id.btnLevantamientoFisico, LevantamientoFisicoActivity.class);
         configurarBoton(R.id.btn_dev_libro, DevolucionLibroActivity.class);
     }
 
