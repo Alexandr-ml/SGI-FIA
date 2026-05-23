@@ -33,11 +33,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Número de Serie"
-            android:textStyle="bold"
+            android:layout_marginBottom="4dp"
+            android:text="Número de Serie o ID"
             android:textColor="#212121"
             android:textSize="13sp"
-            android:layout_marginBottom="4dp"/>
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edit_num_serie"
