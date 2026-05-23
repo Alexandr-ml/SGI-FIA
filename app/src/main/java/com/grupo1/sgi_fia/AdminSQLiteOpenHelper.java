@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
     public static final String NOMBRE_BD = "SGIFIA.db";
-    public static final int VERSION_BD = 5;
+    public static final int VERSION_BD = 6;
 
     public AdminSQLiteOpenHelper(@Nullable Context context, @Nullable String name,
                                  @Nullable SQLiteDatabase.CursorFactory factory, int version) {
@@ -59,6 +59,9 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "fecha_devolucion TEXT, " +
                 "FOREIGN KEY(id_prestamo) REFERENCES prestamos(id_prestamo))");
 
+        crearTablaEquiposInformaticos(db);
+        insertarEquiposIniciales(db);
+
         db.execSQL("CREATE TABLE IF NOT EXISTS prestamos_equipo_horas (" +
                 "id_prestamo INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "nombre_prestatario TEXT NOT NULL, " +
@@ -84,13 +87,40 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS prestamos_tesis");
-        db.execSQL("DROP TABLE IF EXISTS prestamos_equipo_horas");
-        db.execSQL("DROP TABLE IF EXISTS devoluciones");
-        db.execSQL("DROP TABLE IF EXISTS prestamos");
-        db.execSQL("DROP TABLE IF EXISTS documentos");
-        db.execSQL("DROP TABLE IF EXISTS prestatarios");
-        db.execSQL("DROP TABLE IF EXISTS usuarios");
-        onCreate(db);
+        if (oldVersion < 5) {
+            db.execSQL("DROP TABLE IF EXISTS prestamos_tesis");
+            db.execSQL("DROP TABLE IF EXISTS prestamos_equipo_horas");
+            db.execSQL("DROP TABLE IF EXISTS equipos_informaticos");
+            db.execSQL("DROP TABLE IF EXISTS devoluciones");
+            db.execSQL("DROP TABLE IF EXISTS prestamos");
+            db.execSQL("DROP TABLE IF EXISTS documentos");
+            db.execSQL("DROP TABLE IF EXISTS prestatarios");
+            db.execSQL("DROP TABLE IF EXISTS usuarios");
+            onCreate(db);
+            return;
+        }
+
+        if (oldVersion < 6) {
+            crearTablaEquiposInformaticos(db);
+            insertarEquiposIniciales(db);
+        }
+    }
+
+    private void crearTablaEquiposInformaticos(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS equipos_informaticos (" +
+                "id_equipo INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "nombre TEXT NOT NULL, " +
+                "modelo TEXT NOT NULL, " +
+                "estado_funcional TEXT NOT NULL, " +
+                "estado_prestamo TEXT NOT NULL)");
+    }
+
+    private void insertarEquiposIniciales(SQLiteDatabase db) {
+        db.execSQL("INSERT OR IGNORE INTO equipos_informaticos " +
+                "(id_equipo, nombre, modelo, estado_funcional, estado_prestamo) VALUES " +
+                "(1, 'Monitor Dell', 'S2725HSM', 'Activo', 'Disponible')");
+        db.execSQL("INSERT OR IGNORE INTO equipos_informaticos " +
+                "(id_equipo, nombre, modelo, estado_funcional, estado_prestamo) VALUES " +
+                "(2, 'Impresora HP', 'Smart Tank 580', 'Activo', 'Disponible')");
     }
 }

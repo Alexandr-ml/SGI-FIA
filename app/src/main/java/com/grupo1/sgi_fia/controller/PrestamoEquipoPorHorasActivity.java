@@ -3,19 +3,25 @@ package com.grupo1.sgi_fia.controller;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
 import com.grupo1.sgi_fia.R;
-import com.grupo1.sgi_fia.model.EquiposRegistrados;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
@@ -24,6 +30,8 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private EditText etFechaPrestamo;
     private EditText etHoraInicio;
     private EditText etHoraFin;
+    private LinearLayout contenedorEquipos;
+    private final List<String> equiposRegistrados = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +42,13 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         etFechaPrestamo = findViewById(R.id.etFechaPrestamoEquipo);
         etHoraInicio = findViewById(R.id.etHoraInicioEquipo);
         etHoraFin = findViewById(R.id.etHoraFinEquipo);
+        contenedorEquipos = findViewById(R.id.contenedorEquiposPrestamo);
         View btnRegistrar = findViewById(R.id.btnRegistrarPrestamoEquipo);
         View btnCancelar = findViewById(R.id.btnCancelarPrestamoEquipo);
         View btnBuscarPrestatario = findViewById(R.id.btnBuscarPrestatarioEquipo);
         View btnAnadirEquipo = findViewById(R.id.btnAnadirEquipoPrestamo);
 
+        cargarEquiposRegistrados();
         etFechaPrestamo.setOnClickListener(view -> mostrarSelectorFecha(etFechaPrestamo));
         etHoraInicio.setOnClickListener(view -> mostrarSelectorHora(etHoraInicio));
         etHoraFin.setOnClickListener(view -> mostrarSelectorHora(etHoraFin));
@@ -53,12 +63,17 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private void registrarPrestamo() {
         String nombre = obtenerTexto(etNombrePrestatario);
         String carnet = "N/A";
-        String equipo = EquiposRegistrados.obtenerListadoParaPrestamo();
+        String equipo = obtenerListadoEquiposParaPrestamo();
         String fecha = obtenerTexto(etFechaPrestamo);
         String horaInicio = obtenerTexto(etHoraInicio);
         String horaFin = obtenerTexto(etHoraFin);
         String actividad = "Prestamo por horas";
         String observaciones = "";
+
+        if (equipo.isEmpty()) {
+            Toast.makeText(this, "No hay equipos registrados", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (nombre.isEmpty() || fecha.isEmpty() || horaInicio.isEmpty() || horaFin.isEmpty()) {
             Toast.makeText(this, "Complete los campos obligatorios", Toast.LENGTH_SHORT).show();
@@ -127,5 +142,102 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         etFechaPrestamo.setText("");
         etHoraInicio.setText("");
         etHoraFin.setText("");
+    }
+
+    private void cargarEquiposRegistrados() {
+        contenedorEquipos.removeAllViews();
+        equiposRegistrados.clear();
+
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
+                this,
+                AdminSQLiteOpenHelper.NOMBRE_BD,
+                null,
+                AdminSQLiteOpenHelper.VERSION_BD);
+        SQLiteDatabase db = admin.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT nombre, modelo FROM equipos_informaticos ORDER BY id_equipo",
+                null);
+
+        while (cursor.moveToNext()) {
+            String nombre = cursor.getString(0);
+            String modelo = cursor.getString(1);
+            String modeloFormateado = formatearModelo(modelo);
+            equiposRegistrados.add(nombre + " - " + modeloFormateado);
+            contenedorEquipos.addView(crearFilaEquipo(nombre, modeloFormateado));
+        }
+
+        cursor.close();
+        db.close();
+
+        if (equiposRegistrados.isEmpty()) {
+            contenedorEquipos.addView(crearFilaEquipo("Sin equipos registrados", "Revise SGIFIA.db"));
+        }
+    }
+
+    private View crearFilaEquipo(String nombre, String modelo) {
+        LinearLayout fila = new LinearLayout(this);
+        fila.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(34)));
+        fila.setGravity(Gravity.CENTER_VERTICAL);
+        fila.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout textos = new LinearLayout(this);
+        textos.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1));
+        textos.setOrientation(LinearLayout.VERTICAL);
+
+        TextView titulo = new TextView(this);
+        titulo.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        titulo.setIncludeFontPadding(false);
+        titulo.setText(nombre);
+        titulo.setTextColor(Color.parseColor("#1A1A1A"));
+        titulo.setTextSize(11);
+
+        TextView subtitulo = new TextView(this);
+        subtitulo.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        subtitulo.setIncludeFontPadding(false);
+        subtitulo.setText(modelo);
+        subtitulo.setTextColor(Color.parseColor("#444444"));
+        subtitulo.setTextSize(8);
+
+        TextView flecha = new TextView(this);
+        flecha.setLayoutParams(new LinearLayout.LayoutParams(
+                dp(18),
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        flecha.setGravity(Gravity.END);
+        flecha.setText(">");
+        flecha.setTextColor(Color.parseColor("#1A1A1A"));
+        flecha.setTextSize(14);
+
+        textos.addView(titulo);
+        textos.addView(subtitulo);
+        fila.addView(textos);
+        fila.addView(flecha);
+        return fila;
+    }
+
+    private String obtenerListadoEquiposParaPrestamo() {
+        if (equiposRegistrados.isEmpty()) {
+            cargarEquiposRegistrados();
+        }
+        return String.join("; ", equiposRegistrados);
+    }
+
+    private String formatearModelo(String modelo) {
+        if (modelo.startsWith("Modelo ")) {
+            return modelo;
+        }
+        return "Modelo " + modelo;
+    }
+
+    private int dp(int valor) {
+        return (int) (valor * getResources().getDisplayMetrics().density + 0.5f);
     }
 }
