@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F8F9FA"
+    tools:ignore="HardcodedText">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar Equipo Informático"
+            android:textColor="#212121"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="2dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Llene los campos para el activo FIA:"
+            android:textColor="#666666"
+            android:textSize="13sp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Número de Serie"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:textSize="13sp"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/edit_num_serie"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Número de serie único"
+            android:textSize="14sp"
+            android:background="@android:drawable/edit_text"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:inputType="textCapCharacters"
+            android:importantForAutofill="no"
+            android:layout_marginBottom="12dp"
+            tools:ignore="RtlSymmetry" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:weightSum="2"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Marca"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/edit_marca"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ej: Dell"
+                    android:textSize="14sp"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:background="@android:drawable/edit_text"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Modelo"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/edit_modelo"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ej: Latitude"
+                    android:textSize="14sp"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:background="@android:drawable/edit_text"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:weightSum="2"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cantidad"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/edit_cantidad_hardware"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ej: 1"
+                    android:textSize="14sp"
+                    android:inputType="number"
+                    android:importantForAutofill="no"
+                    android:background="@android:drawable/edit_text"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clasificación"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <Spinner
+                    android:id="@+id/spinner_clasificacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ubicación de Asignación"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:textSize="13sp"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/edit_ubicacion"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Ej: Cubículo 1 Ing. Industrial"
+            android:textSize="14sp"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:background="@android:drawable/edit_text"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginBottom="12dp"
+            tools:ignore="RtlSymmetry" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:weightSum="2"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Responsable"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/edit_responsable"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Nombre docente"
+                    android:textSize="14sp"
+                    android:importantForAutofill="no"
+                    android:inputType="textPersonName"
+                    android:background="@android:drawable/edit_text"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp"
+                tools:ignore="MarginLeftRight">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Contacto"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/edit_contacto"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ext / Correo"
+                    android:textSize="14sp"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:background="@android:drawable/edit_text"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btn_cancelar_equipo"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Cancelar"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#212121"
+                android:layout_marginEnd="6dp"
+                tools:ignore="MarginLeftRight" />
+
+            <Button
+                android:id="@+id/btn_guardar_equipo"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Guardar"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#D32F2F"
+                android:textStyle="bold"
+                android:layout_marginStart="6dp"
+                tools:ignore="MarginLeftRight" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

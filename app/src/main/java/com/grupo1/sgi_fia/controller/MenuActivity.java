@@ -25,13 +25,21 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
-        Button btnPrestamoPorHoras = findViewById(R.id.btnPrestamoPorHoras);
-        Button btnPrestamoRecurrente = findViewById(R.id.btnPrestamoRecurrente);
-        Button btnPrestamoTesis = findViewById(R.id.btnPrestamoTesis);
+        configurarBoton(R.id.btnNuevoEquipoInformatico, AnadirEquipoActivity.class);
+        configurarBoton(R.id.btnNuevoLibro, RegistroDocumentosActivity.class);
+        configurarBoton(R.id.btnNuevaTesis, RegistroDocumentosActivity.class);
+        configurarBoton(R.id.btnPrestamoPorHoras, PrestamoEquipoPorHorasActivity.class);
+        configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
+        configurarBoton(R.id.btnPrestamoTesis, PrestamoTesisActivity.class);
+        configurarBoton(R.id.btnLevantamientoFisico, LevantamientoFisicoActivity.class);
+        configurarBoton(R.id.btn_dev_libro, DevolucionLibroActivity.class);
+    }
 
-        btnPrestamoPorHoras.setOnClickListener(view -> abrirPantalla(PrestamoEquipoPorHorasActivity.class));
-        btnPrestamoRecurrente.setOnClickListener(view -> abrirPantalla(PrestamoDeEquipoRecurrente.class));
-        btnPrestamoTesis.setOnClickListener(view -> abrirPantalla(PrestamoTesisActivity.class));
+    private void configurarBoton(int idBoton, Class<?> pantalla) {
+        Button boton = findViewById(idBoton);
+        if (boton != null) {
+            boton.setOnClickListener(view -> abrirPantalla(pantalla));
+        }
     }
 
     private void abrirPantalla(Class<?> pantalla) {
