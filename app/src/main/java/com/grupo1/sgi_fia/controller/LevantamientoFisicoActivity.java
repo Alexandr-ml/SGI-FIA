@@ -21,6 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.grupo1.sgi_fia.R;
 import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LevantamientoFisicoActivity extends AppCompatActivity {
 
     private Spinner spinnerPeriodo, spinnerUbicacion;
@@ -64,8 +67,9 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         adapterPeriodo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPeriodo.setAdapter(adapterPeriodo);
 
-        String[] ubicaciones = {"Cubículo 1 Ing. Industrial", "Jefatura Ing. de Sistemas", "Secretaría Ing. Mecánica", "Dirección Ing. Civil"};
-        ArrayAdapter<String> adapterUbicacion = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, ubicaciones);
+        // 🌟 CAMBIO AQUÍ: Ahora cargamos las ubicaciones dinámicamente de la Base de Datos
+        List<String> ubicacionesReales = obtenerUbicacionesDesdeBD();
+        ArrayAdapter<String> adapterUbicacion = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, ubicacionesReales);
         adapterUbicacion.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUbicacion.setAdapter(adapterUbicacion);
 
@@ -97,6 +101,8 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         }
 
         SQLiteDatabase db = adminHelper.getReadableDatabase();
+
+        // ⚠️ NOTA: Asegúrate de si tu columna se llama "numero_serie" o "num_serie" en hardware
         Cursor cursor = db.rawQuery("SELECT id_hardware, marca, modelo, responsable FROM hardware WHERE numero_serie = ?", new String[]{serie});
 
         if (cursor.moveToFirst()) {
@@ -121,6 +127,12 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
     private void guardarRegistroAuditoria() {
         String observaciones = editObservaciones.getText().toString().trim();
         String periodo = spinnerPeriodo.getSelectedItem().toString();
+
+        // Validación en caso de que la lista de ubicaciones esté vacía
+        if (spinnerUbicacion.getSelectedItem() == null) {
+            Toast.makeText(this, "⚠️ No hay ubicaciones registradas en el sistema", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String ubicacionReal = spinnerUbicacion.getSelectedItem().toString();
 
         if (idHardwareEncontrado == -1) {
@@ -153,5 +165,30 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "❌ Error al guardar en la BD", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // 🌟 MÉTODO NUEVO: Consulta dinámica a la tabla hardware para poblar el Spinner solo con datos reales
+    private List<String> obtenerUbicacionesDesdeBD() {
+        List<String> listaUbicaciones = new ArrayList<>();
+        listaUbicaciones.add("Seleccione una ubicación");
+
+        try {
+            SQLiteDatabase db = adminHelper.getReadableDatabase();
+
+            // Buscamos las ubicaciones sin repetir (DISTINCT) y ordenadas alfabéticamente (ASC)
+            String query = "SELECT DISTINCT ubicacion FROM hardware WHERE ubicacion IS NOT NULL AND ubicacion != '' ORDER BY ubicacion ASC";
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    listaUbicaciones.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listaUbicaciones;
     }
 }

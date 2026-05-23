@@ -22,6 +22,7 @@ public class AnadirEquipoActivity extends AppCompatActivity {
     private Button btnGuardar, btnCancelar;
     private AdminSQLiteOpenHelper adminHelper;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    tools:ignore="HardcodedText">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,57 +28,39 @@
             android:text="Auditoría de activos y control de faltantes (FIA):"
             android:textColor="#666666"
             android:textSize="12sp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="16dp"/>
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:text="Año Periodo"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.8"
-                android:orientation="vertical"
-                android:layout_marginRight="4dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Año Periodo"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A1A"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="2dp"/>
-                <Spinner
-                    android:id="@+id/spinner_periodo_auditoria"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@android:drawable/btn_dropdown"/>
-            </LinearLayout>
+        <Spinner
+            android:id="@+id/spinner_periodo_auditoria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginBottom="12dp"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.2"
-                android:orientation="vertical"
-                android:layout_marginLeft="4dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación a Revisar"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A1A"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="2dp"/>
-                <Spinner
-                    android:id="@+id/spinner_ubicacion_auditoria"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@android:drawable/btn_dropdown"/>
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ubicación a Revisar"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp"/>
+
+        <Spinner
+            android:id="@+id/spinner_ubicacion_auditoria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -85,7 +69,7 @@
             android:textStyle="bold"
             android:textColor="#1A1A1A"
             android:textSize="12sp"
-            android:layout_marginBottom="2dp"/>
+            android:layout_marginBottom="4dp"/>
 
         <EditText
             android:id="@+id/edit_buscar_auditoria"
@@ -95,8 +79,10 @@
             android:textSize="13sp"
             android:background="@android:drawable/edit_text"
             android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:importantForAutofill="no"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="12dp"
+            tools:ignore="RtlSymmetry" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,7 +90,7 @@
             android:orientation="vertical"
             android:background="@android:drawable/dialog_holo_light_frame"
             android:padding="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:id="@+id/txt_info_equipo_auditoria"
@@ -150,7 +136,7 @@
             android:textStyle="bold"
             android:textColor="#1A1A1A"
             android:textSize="12sp"
-            android:layout_marginBottom="2dp"/>
+            android:layout_marginBottom="4dp"/>
 
         <EditText
             android:id="@+id/edit_observaciones_auditoria"
@@ -161,7 +147,9 @@
             android:importantForAutofill="no"
             android:background="@android:drawable/edit_text"
             android:paddingLeft="8dp"
-            android:layout_marginBottom="10dp"/>
+            android:paddingRight="8dp"
+            android:layout_marginBottom="14dp"
+            tools:ignore="RtlSymmetry" />
 
         <TextView
             android:id="@+id/txt_resumen_auditoria"
@@ -172,7 +160,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="16dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -189,7 +177,8 @@
                 android:textSize="14sp"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#333333"
-                android:layout_marginRight="4dp"/>
+                android:layout_marginRight="4dp"
+                tools:ignore="MarginLeftRight" />
 
             <Button
                 android:id="@+id/btn_guardar_auditoria"
@@ -200,7 +189,8 @@
                 android:textSize="14sp"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#D32F2F"
-                android:layout_marginLeft="4dp"/>
+                android:layout_marginLeft="4dp"
+                tools:ignore="MarginLeftRight" />
         </LinearLayout>
 
     </LinearLayout>

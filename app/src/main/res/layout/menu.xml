@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,7 +31,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Menú de Acciones"
+            android:text="Menú Principal"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -92,18 +92,6 @@
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#424242"
-                android:layout_marginBottom="6dp" />
-
-            <Button
-                android:id="@+id/btnLevantamientoFisico"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Levantamiento físico anual"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#D32F2F"
-                android:textStyle="bold"
                 android:layout_marginBottom="16dp" />
 
             <View
@@ -126,44 +114,61 @@
                 android:id="@+id/btnNuevoLibro"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="Añadir nuevo libro"
-                android:textSize="13sp"
+                android:layout_marginBottom="6dp"
+                android:backgroundTint="#212121"
+                android:text="Añadir nuevo libro o tesis"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:backgroundTint="#212121"
-                android:layout_marginBottom="6dp" />
-
-            <Button
-                android:id="@+id/btnNuevaTesis"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Añadir nueva tesis"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#212121"
-                android:layout_marginBottom="6dp" />
+                android:textSize="13sp" />
 
             <Button
                 android:id="@+id/btn_dev_libro"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="Devolución de libro"
-                android:textSize="13sp"
+                android:backgroundTint="#E0E0E0"
+                android:text="Devolución de libro o tesis"
                 android:textAllCaps="false"
                 android:textColor="#212121"
-                android:backgroundTint="#E0E0E0"
+                android:textSize="13sp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#DCDCDC"
+                android:layout_marginBottom="14dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AUDITORÍA Y CONTROL DE ACTIVOS"
+                android:textColor="#D32F2F"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp"/>
+
+            <Button
+                android:id="@+id/btnLevantamientoFisico"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Levantamiento físico anual"
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#212121"
                 android:layout_marginBottom="6dp" />
 
             <Button
-                android:id="@+id/btn_dev_tesis"
+                android:id="@+id/btnRegistrosAuditoria"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="Devolución de tesis"
+                android:text="Ver registros de auditoría (Historial)"
                 android:textSize="13sp"
                 android:textAllCaps="false"
-                android:textColor="#212121"
-                android:backgroundTint="#E0E0E0"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#D32F2F"
+                android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
         </LinearLayout>
