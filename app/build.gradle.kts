@@ -49,6 +49,10 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+// Fuerza al sistema a utilizar una única versión de anotaciones para evitar colisiones en el classpath
+    implementation("org.jetbrains:annotations:23.0.0")
 
-
+}
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
 }

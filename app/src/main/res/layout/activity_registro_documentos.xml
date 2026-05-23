@@ -10,24 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Agregar nuevo\nlibro o tesis"
-            android:textColor="#1A1A1A"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+        android:padding="20dp"> <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agregar nuevo\nlibro o tesis"
+        android:textColor="#1A1A1A"
+        android:textSize="24sp" android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Por favor llene los siguientes campos para completar el registro:"
             android:textColor="#666666"
-            android:textSize="14sp"
-            android:layout_marginBottom="20dp"/>
+            android:textSize="13sp" android:layout_marginBottom="14dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -35,16 +31,16 @@
             android:text="Id"
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <EditText
             android:id="@+id/etIdDocumento"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:drawable/edit_text"
+            android:layout_height="42dp" android:background="@android:drawable/edit_text"
             android:hint="Id de libro o tesis"
             android:paddingLeft="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"
+            android:textSize="14sp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -52,16 +48,17 @@
             android:text="Título."
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <EditText
             android:id="@+id/etTituloDocumento"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@android:drawable/edit_text"
             android:hint="Ingrese el título del libro o tesis."
             android:paddingLeft="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"
+            android:textSize="14sp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -69,13 +66,13 @@
             android:text="Tipo."
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <Spinner
             android:id="@+id/spinnerTipo"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="12dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -83,16 +80,17 @@
             android:text="ISBN"
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <EditText
             android:id="@+id/etIsbn"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@android:drawable/edit_text"
             android:hint="Ingrese ISBN"
             android:paddingLeft="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"
+            android:textSize="14sp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -100,16 +98,17 @@
             android:text="Idioma"
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <EditText
             android:id="@+id/etIdioma"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@android:drawable/edit_text"
             android:hint="Ingrese el idioma."
             android:paddingLeft="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"
+            android:textSize="14sp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -117,16 +116,34 @@
             android:text="Año"
             android:textStyle="bold"
             android:textColor="#333333"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="2dp"/>
         <EditText
             android:id="@+id/etAnio"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@android:drawable/edit_text"
             android:hint="Ingrese el año."
             android:paddingLeft="12dp"
-            android:layout_marginBottom="24dp"
-            android:inputType="number"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="number"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ejemplares"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="2dp"/>
+        <EditText
+            android:id="@+id/etEjemplaresDocumento"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="@android:drawable/edit_text"
+            android:hint="Ingrese cantidad de ejemplares."
+            android:paddingLeft="12dp"
+            android:layout_marginBottom="20dp" android:inputType="number"
+            android:textSize="14sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -137,19 +154,19 @@
             <Button
                 android:id="@+id/btnGuardar"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_weight="1"
-                android:layout_marginRight="8dp"
+                android:layout_marginRight="6dp"
                 android:backgroundTint="#2E2E2E"
                 android:text="Guardar"
                 android:textColor="#FFFFFF"/>
 
             <Button
-                android:id="@+id/btnCancelar"
+                android:id="@+id/btnRegresar"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_weight="1"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="6dp"
                 android:backgroundTint="#E52424"
                 android:text="Cancelar"
                 android:textColor="#FFFFFF"/>
