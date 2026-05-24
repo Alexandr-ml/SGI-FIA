@@ -24,6 +24,14 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnNuevoEquipoInformatico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="48dp"
+            android:text="Anadir nuevo equipo informatico" />
+
+        <Button
             android:id="@+id/btnNuevoLibro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,6 +48,14 @@
             android:text="Anadir nueva tesis" />
 
         <Button
+            android:id="@+id/btnBusquedaHardwareLibro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="48dp"
+            android:text="Busqueda de hardware o libro" />
+
+        <Button
             android:id="@+id/btnPrestamoPorHoras"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,6 +70,14 @@
             android:layout_marginBottom="12dp"
             android:minHeight="56dp"
             android:text="Prestamo recurrente de equipo" />
+
+        <Button
+            android:id="@+id/btnPrestamoLibro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="56dp"
+            android:text="Prestamo de libro" />
 
         <Button
             android:id="@+id/btnPrestamoTesis"
@@ -75,7 +99,15 @@
             android:id="@+id/btnDevolucionTesis"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:minHeight="48dp"
             android:text="Devolucion de tesis" />
+
+        <Button
+            android:id="@+id/btnLevantamientoFisico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="Levantamiento fisico" />
     </LinearLayout>
 </ScrollView>

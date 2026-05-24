@@ -11,6 +11,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SGIFIA">
         <activity
+            android:name=".controller.LevantamientoFisicoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.AgregarEquipoInformaticoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.BusquedaHardwareLibroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.PrestamoLibroActivity"
+            android:exported="false" />
+        <activity
             android:name=".controller.PrestamoTesisActivity"
             android:exported="false" />
         <activity

@@ -25,13 +25,17 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
+        configurarBoton(R.id.btnNuevoEquipoInformatico, AgregarEquipoInformaticoActivity.class);
         configurarBoton(R.id.btnNuevoLibro, RegistroDocumentosActivity.class);
         configurarBoton(R.id.btnNuevaTesis, RegistroDocumentosActivity.class);
+        configurarBoton(R.id.btnBusquedaHardwareLibro, BusquedaHardwareLibroActivity.class);
         configurarBoton(R.id.btnPrestamoPorHoras, PrestamoEquipoPorHorasActivity.class);
         configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
+        configurarBoton(R.id.btnPrestamoLibro, PrestamoLibroActivity.class);
         configurarBoton(R.id.btnPrestamoTesis, PrestamoTesisActivity.class);
         configurarBoton(R.id.btn_dev_libro, DevolucionLibroActivity.class);
         configurarBoton(R.id.btnDevolucionTesis, DevolucionTesisActivity.class);
+        configurarBoton(R.id.btnLevantamientoFisico, LevantamientoFisicoActivity.class);
     }
 
     private void configurarBoton(int idBoton, Class<?> pantalla) {
