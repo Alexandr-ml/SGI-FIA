@@ -1,133 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controller.PrestamoDeEquipoRecurrente">
+    android:background="#FFFFFF"
+    android:fillViewport="true">
 
     <LinearLayout
-        android:layout_width="409dp"
-        android:layout_height="729dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingStart="16dp"
+        android:paddingTop="30dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="18dp">
 
         <TextView
-            android:id="@+id/textView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Prestamo Recurrente de Equipo Informatico"
-            android:textSize="24sp" />
-
-        <Button
-            android:id="@+id/button8"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Buscar prestatario" />
+            android:includeFontPadding="false"
+            android:text="Préstamo de\nequipo informático"
+            android:textColor="#1A1A1A"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Prestar a:" />
+            android:layout_marginTop="5dp"
+            android:text="Recurrente"
+            android:textColor="#1A1A1A"
+            android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/textView10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Fecha de inicio del prestamo" />
+            android:layout_marginTop="17dp"
+            android:text="Busque el prestatario del equipo."
+            android:textColor="#333333"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/btnBuscarPrestatarioRecurrente"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_button_dark_compact"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Buscar prestatario"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="10dp"
+            android:background="#E5E7EB" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="Prestar a:"
+            android:textColor="#1A1A1A"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etNombrePrestatarioRecurrente"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/bg_input_compact"
+            android:hint="Nombre de prestatario"
+            android:inputType="textPersonName"
+            android:textColor="#1A1A1A"
+            android:textColorHint="#8A8F98"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:text="Fecha de inicio de préstamo"
+            android:textColor="#333333"
+            android:textSize="10sp" />
+
+        <EditText
+            android:id="@+id/etFechaInicioRecurrente"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_compact"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_calendar_16"
+            android:focusable="false"
+            android:hint="06/06/2026"
+            android:inputType="date"
+            android:textColor="#1A1A1A"
+            android:textColorHint="#1A1A1A"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Fecha de fin de préstamo"
+            android:textColor="#333333"
+            android:textSize="10sp" />
+
+        <EditText
+            android:id="@+id/etFechaFinRecurrente"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_compact"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_calendar_16"
+            android:focusable="false"
+            android:hint="12/11/2026"
+            android:inputType="date"
+            android:textColor="#1A1A1A"
+            android:textColorHint="#1A1A1A"
+            android:textSize="11sp" />
+
+        <LinearLayout
+            android:id="@+id/contenedorEquiposRecurrente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="19dp"
+            android:orientation="vertical" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editTextDate3"
+            <TextView
+                android:id="@+id/btnAnadirEquipoRecurrente"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="date" />
+                android:layout_height="30dp"
+                android:background="@drawable/bg_button_dark_compact"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="13dp"
+                android:paddingEnd="13dp"
+                android:text="Añadir"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp" />
 
-            <Button
-                android:id="@+id/button10"
+            <TextView
+                android:id="@+id/btnAnadirEquipoEscaneoRecurrente"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Hora inicio" />
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_dark_compact"
+                android:clickable="true"
+                android:drawableEnd="@drawable/ic_scan_14"
+                android:drawablePadding="5dp"
+                android:focusable="true"
+                android:gravity="center"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="13dp"
+                android:paddingEnd="10dp"
+                android:text="Añadir mediante escaneo"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView11"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fecha de fin del prestamo" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="bottom"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editTextDate4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/btnRegistrarPrestamoRecurrente"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="11dp"
                 android:layout_weight="1"
-                android:ems="10"
-                android:inputType="date" />
+                android:background="@drawable/bg_button_dark_compact"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="Registrar préstamo"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp" />
 
-            <Button
-                android:id="@+id/button11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/btnCancelarPrestamoRecurrente"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="11dp"
                 android:layout_weight="1"
-                android:text="Hora fin" />
+                android:background="@drawable/bg_button_red_compact"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="Cancelar"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/button12"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Añadir" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button13"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Registar prestamo" />
-
-            <Button
-                android:id="@+id/button14"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Cancelar" />
-        </LinearLayout>
-
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

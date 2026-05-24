@@ -31,6 +31,7 @@ public class MenuActivity extends AppCompatActivity {
         configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
         configurarBoton(R.id.btnPrestamoTesis, PrestamoTesisActivity.class);
         configurarBoton(R.id.btn_dev_libro, DevolucionLibroActivity.class);
+        configurarBoton(R.id.btnDevolucionTesis, DevolucionTesisActivity.class);
     }
 
     private void configurarBoton(int idBoton, Class<?> pantalla) {

@@ -17,6 +17,9 @@
             android:name=".controller.PrestamoEquipoPorHorasActivity"
             android:exported="false" />
         <activity
+            android:name=".controller.DevolucionTesisActivity"
+            android:exported="false" />
+        <activity
             android:name=".controller.PrestamoDeEquipoRecurrente"
             android:exported="false" />
         <activity

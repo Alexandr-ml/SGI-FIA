@@ -67,7 +67,15 @@
             android:id="@+id/btn_dev_libro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:minHeight="48dp"
             android:text="Devolucion de libro" />
+
+        <Button
+            android:id="@+id/btnDevolucionTesis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="Devolucion de tesis" />
     </LinearLayout>
 </ScrollView>
