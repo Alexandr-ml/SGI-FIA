@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controller.MenuActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="409dp"
+        android:layout_height="729dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="173dp"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="178dp"
+            android:layout_marginBottom="1dp"
+            android:text="Acciones"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="407dp"
+            android:layout_height="630dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView">
+
+            <Button
+                android:id="@+id/btnNuevoEquipoInformatico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nuevo equipo informatico"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnNuevoLibro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nuevo libro"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnNuevaTesis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir nueva tesis"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnPrestamoPorHoras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prestamo de equipo informatico por horas/actividad"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnPrestamoRecurrente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prestamo recurrente de equipo informatico"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnLevantamientoFisico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Levantamiendo fisico"
+                android:backgroundTint="@color/grey_dark"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

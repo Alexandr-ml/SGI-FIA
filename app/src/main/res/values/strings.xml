@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">SGI-FIA</string>
+    <string name="agregar_equipo_titulo">Agregar equipo informatico.</string>
+    <string name="numero_serie">Número de serie.</string>
+    <string name="escanear">Escanear</string>
+    <string name="marca">Marca</string>
+    <string name="modelo">Modelo.</string>
+    <string name="ubicacion">Ubicación.</string>
+    <string name="costo_unidad">Costo por unidad.</string>
+    <string name="unidades">Unidades.</string>
+    <string name="descripcion">Descripción.</string>
+    <string name="anadir">Añadir</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="levantamiento_fisico_titulo">Levantamiento fisico.</string>
+    <string name="fecha_levantamiento">Fecha de levantamiento.</string>
+    <string name="activos_registrados">Activos registrados</string>
+    <string name="finalizar">Finalizar</string>
+</resources>
