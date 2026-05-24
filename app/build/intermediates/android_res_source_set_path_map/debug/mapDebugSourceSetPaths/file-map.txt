@@ -1,0 +1,7 @@
+com.grupo1.sgi_fia.app-pngs-0 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\build\generated\res\pngs\debug
+com.grupo1.sgi_fia.app-updated_navigation_xml-1 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\build\generated\updated_navigation_xml\debug
+com.grupo1.sgi_fia.app-packageDebugResources-2 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.grupo1.sgi_fia.app-packageDebugResources-3 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.grupo1.sgi_fia.app-debug-4 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.grupo1.sgi_fia.app-debug-5 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\src\debug\res
+com.grupo1.sgi_fia.app-main-6 C:\Users\bjosu\Downloads\SGI-FIA-master\SGI-FIA-master\app\src\main\res

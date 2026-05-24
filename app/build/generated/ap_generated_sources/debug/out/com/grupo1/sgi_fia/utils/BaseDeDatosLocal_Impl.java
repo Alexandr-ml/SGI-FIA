@@ -1,0 +1,261 @@
+package com.grupo1.sgi_fia.utils;
+
+import androidx.annotation.NonNull;
+import androidx.room.InvalidationTracker;
+import androidx.room.RoomOpenDelegate;
+import androidx.room.migration.AutoMigrationSpec;
+import androidx.room.migration.Migration;
+import androidx.room.util.DBUtil;
+import androidx.room.util.TableInfo;
+import androidx.sqlite.SQLite;
+import androidx.sqlite.SQLiteConnection;
+import java.lang.Class;
+import java.lang.Override;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.processing.Generated;
+
+@Generated("androidx.room.RoomProcessor")
+@SuppressWarnings({"unchecked", "deprecation", "removal"})
+public final class BaseDeDatosLocal_Impl extends BaseDeDatosLocal {
+  private volatile EquipoDao _equipoDao;
+
+  private volatile PrestatarioDao _prestatarioDao;
+
+  private volatile InventarioDao _inventarioDao;
+
+  @Override
+  @NonNull
+  protected RoomOpenDelegate createOpenDelegate() {
+    final RoomOpenDelegate _openDelegate = new RoomOpenDelegate(5, "987331502abc414e621a64b7d72a3017", "ab43dc249848571d55658b4c0626b00a") {
+      @Override
+      public void createAllTables(@NonNull final SQLiteConnection connection) {
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `equipos` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT, `clasificacion` TEXT, `estado` TEXT, `unidad_id` INTEGER NOT NULL, `numero_serie` TEXT, `marca` TEXT, `modelo` TEXT, `ubicacion` TEXT, `costo_unidad` REAL NOT NULL, `unidades` INTEGER NOT NULL, `descripcion` TEXT, `fecha_ultimo_levantamiento` TEXT)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `usuarios` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT, `email` TEXT, `tipo_usuario` TEXT)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `unidades` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT, `descripcion` TEXT)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `inventario` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `fecha` TEXT, `descripcion` TEXT)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `inventario_detalle` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inventario_id` INTEGER NOT NULL, `equipo_id` INTEGER NOT NULL, `cantidad_sistema` INTEGER NOT NULL, `cantidad_fisica` INTEGER NOT NULL, `diferencia` INTEGER NOT NULL)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `prestatario` (`id_prestatario` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `carnet` TEXT, `nombre` TEXT, `apellido` TEXT, `correo` TEXT, `telefono` TEXT)");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
+        SQLite.execSQL(connection, "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '987331502abc414e621a64b7d72a3017')");
+      }
+
+      @Override
+      public void dropAllTables(@NonNull final SQLiteConnection connection) {
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `equipos`");
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `usuarios`");
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `unidades`");
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `inventario`");
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `inventario_detalle`");
+        SQLite.execSQL(connection, "DROP TABLE IF EXISTS `prestatario`");
+      }
+
+      @Override
+      public void onCreate(@NonNull final SQLiteConnection connection) {
+      }
+
+      @Override
+      public void onOpen(@NonNull final SQLiteConnection connection) {
+        internalInitInvalidationTracker(connection);
+      }
+
+      @Override
+      public void onPreMigrate(@NonNull final SQLiteConnection connection) {
+        DBUtil.dropFtsSyncTriggers(connection);
+      }
+
+      @Override
+      public void onPostMigrate(@NonNull final SQLiteConnection connection) {
+      }
+
+      @Override
+      @NonNull
+      public RoomOpenDelegate.ValidationResult onValidateSchema(
+          @NonNull final SQLiteConnection connection) {
+        final Map<String, TableInfo.Column> _columnsEquipos = new HashMap<String, TableInfo.Column>(13);
+        _columnsEquipos.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("nombre", new TableInfo.Column("nombre", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("clasificacion", new TableInfo.Column("clasificacion", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("estado", new TableInfo.Column("estado", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("unidad_id", new TableInfo.Column("unidad_id", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("numero_serie", new TableInfo.Column("numero_serie", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("marca", new TableInfo.Column("marca", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("modelo", new TableInfo.Column("modelo", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("ubicacion", new TableInfo.Column("ubicacion", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("costo_unidad", new TableInfo.Column("costo_unidad", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("unidades", new TableInfo.Column("unidades", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("descripcion", new TableInfo.Column("descripcion", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsEquipos.put("fecha_ultimo_levantamiento", new TableInfo.Column("fecha_ultimo_levantamiento", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysEquipos = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesEquipos = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoEquipos = new TableInfo("equipos", _columnsEquipos, _foreignKeysEquipos, _indicesEquipos);
+        final TableInfo _existingEquipos = TableInfo.read(connection, "equipos");
+        if (!_infoEquipos.equals(_existingEquipos)) {
+          return new RoomOpenDelegate.ValidationResult(false, "equipos(com.grupo1.sgi_fia.model.Equipo).\n"
+                  + " Expected:\n" + _infoEquipos + "\n"
+                  + " Found:\n" + _existingEquipos);
+        }
+        final Map<String, TableInfo.Column> _columnsUsuarios = new HashMap<String, TableInfo.Column>(4);
+        _columnsUsuarios.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsuarios.put("nombre", new TableInfo.Column("nombre", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsuarios.put("email", new TableInfo.Column("email", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsuarios.put("tipo_usuario", new TableInfo.Column("tipo_usuario", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysUsuarios = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesUsuarios = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoUsuarios = new TableInfo("usuarios", _columnsUsuarios, _foreignKeysUsuarios, _indicesUsuarios);
+        final TableInfo _existingUsuarios = TableInfo.read(connection, "usuarios");
+        if (!_infoUsuarios.equals(_existingUsuarios)) {
+          return new RoomOpenDelegate.ValidationResult(false, "usuarios(com.grupo1.sgi_fia.model.Usuario).\n"
+                  + " Expected:\n" + _infoUsuarios + "\n"
+                  + " Found:\n" + _existingUsuarios);
+        }
+        final Map<String, TableInfo.Column> _columnsUnidades = new HashMap<String, TableInfo.Column>(3);
+        _columnsUnidades.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUnidades.put("nombre", new TableInfo.Column("nombre", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUnidades.put("descripcion", new TableInfo.Column("descripcion", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysUnidades = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesUnidades = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoUnidades = new TableInfo("unidades", _columnsUnidades, _foreignKeysUnidades, _indicesUnidades);
+        final TableInfo _existingUnidades = TableInfo.read(connection, "unidades");
+        if (!_infoUnidades.equals(_existingUnidades)) {
+          return new RoomOpenDelegate.ValidationResult(false, "unidades(com.grupo1.sgi_fia.model.Unidad).\n"
+                  + " Expected:\n" + _infoUnidades + "\n"
+                  + " Found:\n" + _existingUnidades);
+        }
+        final Map<String, TableInfo.Column> _columnsInventario = new HashMap<String, TableInfo.Column>(3);
+        _columnsInventario.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventario.put("fecha", new TableInfo.Column("fecha", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventario.put("descripcion", new TableInfo.Column("descripcion", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysInventario = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesInventario = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoInventario = new TableInfo("inventario", _columnsInventario, _foreignKeysInventario, _indicesInventario);
+        final TableInfo _existingInventario = TableInfo.read(connection, "inventario");
+        if (!_infoInventario.equals(_existingInventario)) {
+          return new RoomOpenDelegate.ValidationResult(false, "inventario(com.grupo1.sgi_fia.model.Inventario).\n"
+                  + " Expected:\n" + _infoInventario + "\n"
+                  + " Found:\n" + _existingInventario);
+        }
+        final Map<String, TableInfo.Column> _columnsInventarioDetalle = new HashMap<String, TableInfo.Column>(6);
+        _columnsInventarioDetalle.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventarioDetalle.put("inventario_id", new TableInfo.Column("inventario_id", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventarioDetalle.put("equipo_id", new TableInfo.Column("equipo_id", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventarioDetalle.put("cantidad_sistema", new TableInfo.Column("cantidad_sistema", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventarioDetalle.put("cantidad_fisica", new TableInfo.Column("cantidad_fisica", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInventarioDetalle.put("diferencia", new TableInfo.Column("diferencia", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysInventarioDetalle = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesInventarioDetalle = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoInventarioDetalle = new TableInfo("inventario_detalle", _columnsInventarioDetalle, _foreignKeysInventarioDetalle, _indicesInventarioDetalle);
+        final TableInfo _existingInventarioDetalle = TableInfo.read(connection, "inventario_detalle");
+        if (!_infoInventarioDetalle.equals(_existingInventarioDetalle)) {
+          return new RoomOpenDelegate.ValidationResult(false, "inventario_detalle(com.grupo1.sgi_fia.model.InventarioDetalle).\n"
+                  + " Expected:\n" + _infoInventarioDetalle + "\n"
+                  + " Found:\n" + _existingInventarioDetalle);
+        }
+        final Map<String, TableInfo.Column> _columnsPrestatario = new HashMap<String, TableInfo.Column>(6);
+        _columnsPrestatario.put("id_prestatario", new TableInfo.Column("id_prestatario", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPrestatario.put("carnet", new TableInfo.Column("carnet", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPrestatario.put("nombre", new TableInfo.Column("nombre", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPrestatario.put("apellido", new TableInfo.Column("apellido", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPrestatario.put("correo", new TableInfo.Column("correo", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPrestatario.put("telefono", new TableInfo.Column("telefono", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final Set<TableInfo.ForeignKey> _foreignKeysPrestatario = new HashSet<TableInfo.ForeignKey>(0);
+        final Set<TableInfo.Index> _indicesPrestatario = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoPrestatario = new TableInfo("prestatario", _columnsPrestatario, _foreignKeysPrestatario, _indicesPrestatario);
+        final TableInfo _existingPrestatario = TableInfo.read(connection, "prestatario");
+        if (!_infoPrestatario.equals(_existingPrestatario)) {
+          return new RoomOpenDelegate.ValidationResult(false, "prestatario(com.grupo1.sgi_fia.model.Prestatario).\n"
+                  + " Expected:\n" + _infoPrestatario + "\n"
+                  + " Found:\n" + _existingPrestatario);
+        }
+        return new RoomOpenDelegate.ValidationResult(true, null);
+      }
+    };
+    return _openDelegate;
+  }
+
+  @Override
+  @NonNull
+  protected InvalidationTracker createInvalidationTracker() {
+    final Map<String, String> _shadowTablesMap = new HashMap<String, String>(0);
+    final Map<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "equipos", "usuarios", "unidades", "inventario", "inventario_detalle", "prestatario");
+  }
+
+  @Override
+  public void clearAllTables() {
+    super.performClear(false, "equipos", "usuarios", "unidades", "inventario", "inventario_detalle", "prestatario");
+  }
+
+  @Override
+  @NonNull
+  protected Map<Class<?>, List<Class<?>>> getRequiredTypeConverters() {
+    final Map<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
+    _typeConvertersMap.put(EquipoDao.class, EquipoDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(PrestatarioDao.class, PrestatarioDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(InventarioDao.class, InventarioDao_Impl.getRequiredConverters());
+    return _typeConvertersMap;
+  }
+
+  @Override
+  @NonNull
+  public Set<Class<? extends AutoMigrationSpec>> getRequiredAutoMigrationSpecs() {
+    final Set<Class<? extends AutoMigrationSpec>> _autoMigrationSpecsSet = new HashSet<Class<? extends AutoMigrationSpec>>();
+    return _autoMigrationSpecsSet;
+  }
+
+  @Override
+  @NonNull
+  public List<Migration> getAutoMigrations(
+      @NonNull final Map<Class<? extends AutoMigrationSpec>, AutoMigrationSpec> autoMigrationSpecs) {
+    final List<Migration> _autoMigrations = new ArrayList<Migration>();
+    return _autoMigrations;
+  }
+
+  @Override
+  public EquipoDao equipoDao() {
+    if (_equipoDao != null) {
+      return _equipoDao;
+    } else {
+      synchronized(this) {
+        if(_equipoDao == null) {
+          _equipoDao = new EquipoDao_Impl(this);
+        }
+        return _equipoDao;
+      }
+    }
+  }
+
+  @Override
+  public PrestatarioDao prestatarioDao() {
+    if (_prestatarioDao != null) {
+      return _prestatarioDao;
+    } else {
+      synchronized(this) {
+        if(_prestatarioDao == null) {
+          _prestatarioDao = new PrestatarioDao_Impl(this);
+        }
+        return _prestatarioDao;
+      }
+    }
+  }
+
+  @Override
+  public InventarioDao inventarioDao() {
+    if (_inventarioDao != null) {
+      return _inventarioDao;
+    } else {
+      synchronized(this) {
+        if(_inventarioDao == null) {
+          _inventarioDao = new InventarioDao_Impl(this);
+        }
+        return _inventarioDao;
+      }
+    }
+  }
+}

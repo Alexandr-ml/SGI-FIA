@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="grey_dark">#333333</color>
+    <color name="grey_light">#F5F5F5</color>
+    <color name="red_cancel">#E53935</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="activos_registrados">Activos registrados</string>
+    <string name="agregar_equipo_titulo">Agregar equipo informatico.</string>
+    <string name="anadir">Añadir</string>
+    <string name="app_name">SGI-FIA</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="costo_unidad">Costo por unidad.</string>
+    <string name="descripcion">Descripción.</string>
+    <string name="escanear">Escanear</string>
+    <string name="fecha_levantamiento">Fecha de levantamiento.</string>
+    <string name="finalizar">Finalizar</string>
+    <string name="levantamiento_fisico_titulo">Levantamiento fisico.</string>
+    <string name="marca">Marca</string>
+    <string name="modelo">Modelo.</string>
+    <string name="numero_serie">Número de serie.</string>
+    <string name="ubicacion">Ubicación.</string>
+    <string name="unidades">Unidades.</string>
+    <style name="Base.Theme.SGIFIA" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="buttonStyle">@style/CustomButtonStyle</item>
+    </style>
+    <style name="ButtonShapeAppearance" parent="">
+        <item name="cornerSize">0dp</item>
+        <item name="cornerFamily">cut</item>
+    </style>
+    <style name="CustomButtonStyle" parent="Widget.Material3.Button">
+        <item name="shapeAppearanceOverlay">@style/ButtonShapeAppearance</item>
+    </style>
+    <style name="Theme.SGIFIA" parent="Base.Theme.SGIFIA"/>
+</resources>
