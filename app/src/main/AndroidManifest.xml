@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SGIFIA">
         <activity
+            android:name=".controller.DevolucionTesisActivity"
+            android:exported="false" />
+        <activity
             android:name=".controller.PrestamoDeEquipoRecurrente"
             android:exported="false" />
         <activity

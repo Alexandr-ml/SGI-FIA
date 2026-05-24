@@ -1,6 +1,8 @@
 package com.grupo1.sgi_fia.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,5 +24,15 @@ public class MenuActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
+        configurarBoton(R.id.btnDevolucionTesis, DevolucionTesisActivity.class);
+    }
+
+    private void configurarBoton(int idBoton, Class<?> pantalla) {
+        Button boton = findViewById(idBoton);
+        if (boton != null) {
+            boton.setOnClickListener(view -> startActivity(new Intent(this, pantalla)));
+        }
     }
 }

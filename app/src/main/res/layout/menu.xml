@@ -79,6 +79,12 @@
                 android:text="Prestamo recurrente de equipo informatico" />
 
             <Button
+                android:id="@+id/btnDevolucionTesis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Devolución de tesis" />
+
+            <Button
                 android:id="@+id/btnLevantamientoFisico"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
