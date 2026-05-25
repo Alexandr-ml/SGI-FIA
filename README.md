@@ -26,7 +26,7 @@ El script SQLite queda como respaldo documental de la estructura local equivalen
 * Compatibilidad: `minSdk 24`, `targetSdk 36`.
 
 **2. Web**
-
+url: https://pdm-ues.web.app/
 * Desarrollada con HTML, CSS y JavaScript.
 * Arquitectura modular con ES Modules.
 * Base de datos compartida: Firebase Firestore.
