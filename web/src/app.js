@@ -1,6 +1,9 @@
 import { collections, createRepository, initialEquipos } from "./repository.js";
 
 const root = document.querySelector("#app");
+const LOGIN_USER = "Administracion FIA";
+const LOGIN_PASSWORD = "FIA20268";
+const SESSION_KEY = "sgi-fia-authenticated";
 
 const navItems = [
   { id: "dashboard", label: "Panel" },
@@ -19,16 +22,27 @@ const state = {
   search: "",
   physicalFilter: "",
   busy: false,
+  authenticated: sessionStorage.getItem(SESSION_KEY) === "true",
   status: null,
   data: emptyStateData(),
   lastSync: null,
 };
 
 let repository;
+let shellEventsBound = false;
 
 init();
 
 async function init() {
+  if (!state.authenticated) {
+    renderLogin();
+    return;
+  }
+
+  await startApplication();
+}
+
+async function startApplication() {
   try {
     const result = await createRepository();
     repository = result.adapter;
@@ -46,6 +60,61 @@ async function init() {
       </main>
     `;
   }
+}
+
+function renderLogin(errorMessage = "") {
+  setBusy(false);
+  root.innerHTML = `
+    <main class="login-screen">
+      <section class="login-panel" aria-labelledby="loginTitle">
+        <div class="brand-mark" aria-hidden="true">SGI</div>
+        <div>
+          <p class="eyebrow">FIA</p>
+          <h1 id="loginTitle">Acceso administrativo</h1>
+          <p class="login-copy">Sistema de Gestion de Inventario</p>
+        </div>
+        <form class="login-form" data-login-form>
+          <label>
+            <span>Usuario</span>
+            <input name="usuario" autocomplete="username" required autofocus />
+          </label>
+          <label>
+            <span>Contrasena</span>
+            <input name="contrasena" type="password" autocomplete="current-password" required />
+          </label>
+          <p class="login-error" data-login-error ${errorMessage ? "" : "hidden"}>
+            ${escapeHtml(errorMessage)}
+          </p>
+          <button class="primary-button" type="submit">Ingresar</button>
+        </form>
+      </section>
+    </main>
+  `;
+
+  root.querySelector("[data-login-form]").addEventListener("submit", handleLoginSubmit);
+}
+
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+  const data = formData(event.currentTarget);
+  const usuario = clean(data.usuario);
+  const contrasena = clean(data.contrasena);
+
+  if (usuario !== LOGIN_USER || contrasena !== LOGIN_PASSWORD) {
+    showLoginError("Usuario o contrasena incorrectos.");
+    return;
+  }
+
+  state.authenticated = true;
+  sessionStorage.setItem(SESSION_KEY, "true");
+  await startApplication();
+}
+
+function showLoginError(message) {
+  const error = root.querySelector("[data-login-error]");
+  if (!error) return;
+  error.textContent = message;
+  error.hidden = false;
 }
 
 function renderShell() {
@@ -82,6 +151,7 @@ function renderShell() {
             <button class="icon-button" data-refresh type="button" title="Actualizar datos" aria-label="Actualizar datos">
               <span aria-hidden="true">R</span>
             </button>
+            <button class="secondary-button logout-button" data-logout type="button">Salir</button>
           </div>
         </header>
 
@@ -110,9 +180,12 @@ function renderShell() {
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   `;
 
-  root.addEventListener("click", handleClick);
-  root.addEventListener("submit", handleSubmit);
-  root.addEventListener("input", handleInput);
+  if (!shellEventsBound) {
+    root.addEventListener("click", handleClick);
+    root.addEventListener("submit", handleSubmit);
+    root.addEventListener("input", handleInput);
+    shellEventsBound = true;
+  }
   renderContent();
 }
 
@@ -802,6 +875,18 @@ async function handleClick(event) {
   const returnModeButton = event.target.closest("[data-return-mode]");
   const refreshButton = event.target.closest("[data-refresh]");
   const seedButton = event.target.closest("[data-seed-equipment]");
+  const logoutButton = event.target.closest("[data-logout]");
+
+  if (logoutButton) {
+    state.authenticated = false;
+    state.status = null;
+    state.data = emptyStateData();
+    state.lastSync = null;
+    repository = null;
+    sessionStorage.removeItem(SESSION_KEY);
+    renderLogin();
+    return;
+  }
 
   if (viewButton) {
     state.view = viewButton.dataset.view;

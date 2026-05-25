@@ -99,6 +99,21 @@
             android:layout_marginTop="22dp"
             android:orientation="vertical" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Historial de auditorias"
+            android:textColor="#333333"
+            android:textSize="10sp" />
+
+        <LinearLayout
+            android:id="@+id/contenedorHistorialAuditoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0dp"

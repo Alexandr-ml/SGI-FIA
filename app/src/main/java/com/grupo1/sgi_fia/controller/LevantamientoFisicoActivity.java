@@ -18,7 +18,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
 import com.grupo1.sgi_fia.data.SgiFirebase;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +34,7 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
     private EditText etFechaLevantamiento;
     private EditText etNumeroSerie;
     private LinearLayout contenedorActivos;
+    private LinearLayout contenedorHistorial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         etFechaLevantamiento = findViewById(R.id.etFechaLevantamientoFisico);
         etNumeroSerie = findViewById(R.id.etNumeroSerieLevantamiento);
         contenedorActivos = findViewById(R.id.contenedorActivosLevantamiento);
+        contenedorHistorial = findViewById(R.id.contenedorHistorialAuditoria);
         View btnEscanear = findViewById(R.id.btnEscanearLevantamiento);
         View btnFinalizar = findViewById(R.id.btnFinalizarLevantamiento);
         View btnCancelar = findViewById(R.id.btnCancelarLevantamiento);
@@ -67,6 +72,7 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         btnCancelar.setOnClickListener(view -> finish());
 
         cargarActivos("");
+        cargarHistorialAuditoria();
     }
 
     private void cargarActivos(String filtroSerie) {
@@ -151,6 +157,100 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         textos.addView(subtitulo);
         fila.addView(textos);
         fila.addView(indicador);
+
+        return fila;
+    }
+
+    private void cargarHistorialAuditoria() {
+        contenedorHistorial.removeAllViews();
+        contenedorHistorial.addView(crearFilaHistorial("Cargando historial", "Firebase", ""));
+
+        SgiFirebase.list(this, SgiFirebase.LEVANTAMIENTOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> documentos) {
+                contenedorHistorial.removeAllViews();
+                List<DocumentSnapshot> historial = new ArrayList<>(documentos);
+                Collections.sort(historial, new Comparator<DocumentSnapshot>() {
+                    @Override
+                    public int compare(DocumentSnapshot left, DocumentSnapshot right) {
+                        return Long.compare(fechaOrdenable(right), fechaOrdenable(left));
+                    }
+                });
+
+                int agregados = 0;
+                for (DocumentSnapshot levantamiento : historial) {
+                    String fecha = formatearFechaVisible(SgiFirebase.string(levantamiento, "fecha_levantamiento"));
+                    String serie = SgiFirebase.string(levantamiento, "numero_serie");
+                    String alcance = serie.isEmpty() ? "Inventario completo" : "Serie " + serie;
+                    String observaciones = SgiFirebase.string(levantamiento, "observaciones");
+                    if (observaciones.isEmpty()) {
+                        observaciones = "Sin observaciones";
+                    }
+
+                    contenedorHistorial.addView(crearFilaHistorial(fecha, alcance, observaciones));
+                    agregados++;
+                    if (agregados >= 8) {
+                        break;
+                    }
+                }
+
+                if (contenedorHistorial.getChildCount() == 0) {
+                    contenedorHistorial.addView(crearFilaHistorial(
+                            "Sin auditorias registradas", "Firebase", ""));
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                contenedorHistorial.removeAllViews();
+                contenedorHistorial.addView(crearFilaHistorial(
+                        "No se pudo cargar historial", exception.getMessage(), ""));
+            }
+        });
+    }
+
+    private View crearFilaHistorial(String fecha, String alcance, String observaciones) {
+        LinearLayout fila = new LinearLayout(this);
+        fila.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        fila.setGravity(Gravity.CENTER_VERTICAL);
+        fila.setOrientation(LinearLayout.HORIZONTAL);
+        fila.setPadding(0, dp(5), 0, dp(5));
+
+        LinearLayout textos = new LinearLayout(this);
+        textos.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1));
+        textos.setOrientation(LinearLayout.VERTICAL);
+
+        TextView titulo = new TextView(this);
+        titulo.setIncludeFontPadding(false);
+        titulo.setText(fecha);
+        titulo.setTextColor(Color.parseColor("#1A1A1A"));
+        titulo.setTextSize(9);
+
+        TextView subtitulo = new TextView(this);
+        subtitulo.setIncludeFontPadding(false);
+        subtitulo.setText(alcance);
+        subtitulo.setTextColor(Color.parseColor("#444444"));
+        subtitulo.setTextSize(7);
+
+        TextView detalle = new TextView(this);
+        detalle.setLayoutParams(new LinearLayout.LayoutParams(
+                dp(128),
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        detalle.setGravity(Gravity.END);
+        detalle.setText(observaciones);
+        detalle.setTextColor(Color.parseColor("#555555"));
+        detalle.setTextSize(7);
+        detalle.setMaxLines(2);
+
+        textos.addView(titulo);
+        textos.addView(subtitulo);
+        fila.addView(textos);
+        fila.addView(detalle);
 
         return fila;
     }
@@ -250,6 +350,29 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
 
     private String formatearFechaActual() {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+    }
+
+    private String formatearFechaVisible(String fecha) {
+        if (fecha == null || fecha.trim().isEmpty()) {
+            return "Sin fecha";
+        }
+
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(fecha);
+            return new SimpleDateFormat("dd/MM/yyyy", Locale.US).format(date);
+        } catch (ParseException exception) {
+            return fecha;
+        }
+    }
+
+    private long fechaOrdenable(DocumentSnapshot document) {
+        String fecha = SgiFirebase.string(document, "fecha_levantamiento");
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(fecha);
+            return date == null ? 0 : date.getTime();
+        } catch (ParseException exception) {
+            return 0;
+        }
     }
 
     private void mostrarErrorFirebase(Exception exception) {

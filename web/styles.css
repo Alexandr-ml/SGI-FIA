@@ -98,6 +98,71 @@ button:disabled,
   text-align: center;
 }
 
+.login-screen {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(7, 24, 38, 0.96), rgba(15, 39, 54, 0.9)),
+    var(--bg);
+}
+
+.login-panel {
+  display: grid;
+  width: min(420px, 100%);
+  gap: 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: rgba(15, 39, 54, 0.92);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.login-panel h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.55rem;
+}
+
+.login-copy {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.login-form input {
+  min-height: 46px;
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink-dark);
+  padding: 0 12px;
+}
+
+.login-error {
+  margin: 0;
+  border: 1px solid rgba(201, 75, 75, 0.28);
+  border-radius: 8px;
+  background: rgba(201, 75, 75, 0.12);
+  color: #ffd7d7;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+}
+
 .boot-mark,
 .brand-mark {
   display: grid;
