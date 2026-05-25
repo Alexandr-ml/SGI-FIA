@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.github.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.grupo1.sgi_fia">
 
     <application
         android:allowBackup="true"
@@ -11,25 +12,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SGIFIA"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        tools:ignore="DataExtractionRules">
 
+        <activity
+            android:name=".controller.MenuActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".controller.RegistroDocumentosActivity" android:exported="false" />
         <activity android:name=".controller.DevolucionLibroActivity" android:exported="false" />
         <activity android:name=".controller.PrestamoDeEquipoRecurrente" android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".controller.AnadirEquipoActivity" android:exported="false" /><activity
-            android:name=".controller.MenuActivity"
-            android:exported="true"> <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
-
-
-        <activity
-            android:name=".controller.LevantamientoFisicoActivity"
-            android:exported="false" />
-        <activity android:name="com.grupo1.sgi_fia.controller.HistorialAuditoriaActivity" />
+        <activity android:name=".controller.AnadirEquipoActivity" android:exported="false" />
+        <activity android:name=".controller.LevantamientoFisicoActivity" android:exported="false" />
+        <activity android:name=".controller.HistorialAuditoriaActivity" android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
