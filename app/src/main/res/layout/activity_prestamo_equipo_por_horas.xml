@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -11,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingStart="16dp"
-        android:paddingTop="30dp"
+        android:paddingTop="26dp"
         android:paddingEnd="16dp"
         android:paddingBottom="18dp">
 
@@ -19,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:text="Préstamo de\nequipo informático"
+            android:text="Prestamo de\nequipo informatico"
             android:textColor="#1A1A1A"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -28,20 +27,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Recurrente"
+            android:text="Por horas"
             android:textColor="#1A1A1A"
             android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="17dp"
+            android:layout_marginTop="18dp"
             android:text="Busque el prestatario del equipo."
             android:textColor="#333333"
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/btnBuscarPrestatarioRecurrente"
+            android:id="@+id/btnBuscarPrestatarioEquipo"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_marginTop="4dp"
@@ -74,7 +73,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/etNombrePrestatarioRecurrente"
+            android:id="@+id/etNombrePrestatarioEquipo"
             android:layout_width="match_parent"
             android:layout_height="46dp"
             android:layout_marginTop="5dp"
@@ -89,12 +88,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="13dp"
-            android:text="Fecha de inicio de préstamo"
+            android:text="Fecha de prestamo"
             android:textColor="#333333"
             android:textSize="10sp" />
 
         <EditText
-            android:id="@+id/etFechaInicioRecurrente"
+            android:id="@+id/etFechaPrestamoEquipo"
             android:layout_width="match_parent"
             android:layout_height="34dp"
             android:layout_marginTop="4dp"
@@ -112,73 +111,80 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Fecha de fin de préstamo"
+            android:text="Horas de prestamo"
             android:textColor="#333333"
             android:textSize="10sp" />
 
-        <EditText
-            android:id="@+id/etFechaFinRecurrente"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/bg_input_compact"
-            android:clickable="true"
-            android:drawableEnd="@drawable/ic_calendar_16"
-            android:focusable="false"
-            android:hint="12/11/2026"
-            android:inputType="date"
-            android:textColor="#1A1A1A"
-            android:textColorHint="#1A1A1A"
-            android:textSize="11sp" />
-
-        <LinearLayout
-            android:id="@+id/contenedorEquiposRecurrente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="19dp"
-            android:orientation="vertical" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/btnAnadirEquipoRecurrente"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
+            <EditText
+                android:id="@+id/etHoraInicioEquipo"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="7dp"
+                android:layout_weight="1"
                 android:background="@drawable/bg_button_dark_compact"
                 android:clickable="true"
-                android:focusable="true"
+                android:drawableStart="@drawable/ic_clock_16"
+                android:drawablePadding="5dp"
+                android:focusable="false"
                 android:gravity="center"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="13dp"
-                android:paddingEnd="13dp"
-                android:text="Añadir"
+                android:hint="Hora inicio"
+                android:inputType="time"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="10sp" />
 
-            <TextView
-                android:id="@+id/btnAnadirEquipoEscaneoRecurrente"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginStart="8dp"
+            <EditText
+                android:id="@+id/etHoraFinEquipo"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="7dp"
+                android:layout_weight="1"
                 android:background="@drawable/bg_button_dark_compact"
                 android:clickable="true"
-                android:drawableEnd="@drawable/ic_scan_14"
+                android:drawableStart="@drawable/ic_clock_16"
                 android:drawablePadding="5dp"
-                android:focusable="true"
+                android:focusable="false"
                 android:gravity="center"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="13dp"
-                android:paddingEnd="10dp"
-                android:text="Añadir mediante escaneo"
+                android:hint="Hora fin"
+                android:inputType="time"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="10sp" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contenedorEquiposPrestamo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/btnAnadirEquipoPrestamo"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_button_dark_compact"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="13dp"
+            android:paddingEnd="13dp"
+            android:text="Anadir"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
 
         <View
             android:layout_width="match_parent"
@@ -192,7 +198,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/btnRegistrarPrestamoRecurrente"
+                android:id="@+id/btnRegistrarPrestamoEquipo"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="11dp"
@@ -204,12 +210,12 @@
                 android:minHeight="0dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
-                android:text="Registrar préstamo"
+                android:text="Registrar prestamo"
                 android:textColor="#FFFFFF"
                 android:textSize="9sp" />
 
             <TextView
-                android:id="@+id/btnCancelarPrestamoRecurrente"
+                android:id="@+id/btnCancelarPrestamoEquipo"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="11dp"

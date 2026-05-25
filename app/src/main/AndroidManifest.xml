@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +13,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SGIFIA">
         <activity
+            android:name=".controller.LevantamientoFisicoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.AgregarEquipoInformaticoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.BusquedaHardwareLibroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.PrestamoLibroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.PrestamoTesisActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.PrestamoEquipoPorHorasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.DevolucionTesisActivity"
+            android:exported="false" />
+        <activity
             android:name=".controller.PrestamoDeEquipoRecurrente"
+            android:exported="false" />
+        <activity
+            android:name=".controller.RegistroDocumentosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.DevolucionLibroActivity"
             android:exported="false" />
         <activity
             android:name=".controller.MenuActivity"

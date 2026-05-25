@@ -1,6 +1,8 @@
 package com.grupo1.sgi_fia.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,5 +24,29 @@ public class MenuActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        configurarBoton(R.id.btnNuevoEquipoInformatico, AgregarEquipoInformaticoActivity.class);
+        configurarBoton(R.id.btnNuevoLibro, RegistroDocumentosActivity.class);
+        configurarBoton(R.id.btnNuevaTesis, RegistroDocumentosActivity.class);
+        configurarBoton(R.id.btnBusquedaHardwareLibro, BusquedaHardwareLibroActivity.class);
+        configurarBoton(R.id.btnPrestamoPorHoras, PrestamoEquipoPorHorasActivity.class);
+        configurarBoton(R.id.btnPrestamoRecurrente, PrestamoDeEquipoRecurrente.class);
+        configurarBoton(R.id.btnPrestamoLibro, PrestamoLibroActivity.class);
+        configurarBoton(R.id.btnPrestamoTesis, PrestamoTesisActivity.class);
+        configurarBoton(R.id.btn_dev_libro, DevolucionLibroActivity.class);
+        configurarBoton(R.id.btnDevolucionTesis, DevolucionTesisActivity.class);
+        configurarBoton(R.id.btnLevantamientoFisico, LevantamientoFisicoActivity.class);
+    }
+
+    private void configurarBoton(int idBoton, Class<?> pantalla) {
+        Button boton = findViewById(idBoton);
+        if (boton != null) {
+            boton.setOnClickListener(view -> abrirPantalla(pantalla));
+        }
+    }
+
+    private void abrirPantalla(Class<?> pantalla) {
+        Intent intent = new Intent(this, pantalla);
+        startActivity(intent);
     }
 }
