@@ -1,11 +1,8 @@
 import {
-  canUseLocalFallback,
   collections,
   createFirestoreAdapter,
   hasFirebaseConfig,
 } from "./firebase.js";
-
-const STORAGE_KEY = "sgi-fia-web-db-v2";
 
 const initialEquipos = [
   {
@@ -62,145 +59,20 @@ const initialEquipos = [
   },
 ];
 
-const emptyDatabase = Object.fromEntries(
-  Object.values(collections).map((collectionName) => [collectionName, []]),
-);
-
 export async function createRepository() {
   if (hasFirebaseConfig()) {
-    try {
-      const adapter = await createFirestoreAdapter();
-      return {
-        adapter,
-        status: {
-          mode: "firebase",
-          label: `Firebase conectado: ${adapter.projectId}`,
-          tone: "ok",
-        },
-      };
-    } catch (error) {
-      if (!canUseLocalFallback()) {
-        throw error;
-      }
-
-      return {
-        adapter: new LocalStorageAdapter(),
-        status: {
-          mode: "local",
-          label: `Firebase no inicio. Usando datos locales.`,
-          detail: error.message,
-          tone: "warning",
-        },
-      };
-    }
-  }
-
-  return {
-    adapter: new LocalStorageAdapter(),
-    status: {
-      mode: "local",
-      label: "Firebase pendiente. Usando datos locales.",
-      detail: "Complete web/firebase-config.js para activar Cloud Firestore.",
-      tone: "warning",
-    },
-  };
-}
-
-class LocalStorageAdapter {
-  constructor() {
-    this.mode = "local";
-    this.database = this.load();
-  }
-
-  async list(collectionName) {
-    return [...(this.database[collectionName] || [])].sort(compareByDateDesc);
-  }
-
-  async add(collectionName, value) {
-    const id = crypto.randomUUID();
-    const now = new Date().toISOString();
-    this.ensureCollection(collectionName);
-    this.database[collectionName].push({
-      id,
-      ...value,
-      createdAt: now,
-      updatedAt: now,
-    });
-    this.persist();
-    return id;
-  }
-
-  async update(collectionName, id, value) {
-    this.ensureCollection(collectionName);
-    const index = this.database[collectionName].findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new Error(`No existe ${collectionName}/${id}`);
-    }
-    this.database[collectionName][index] = {
-      ...this.database[collectionName][index],
-      ...value,
-      updatedAt: new Date().toISOString(),
+    const adapter = await createFirestoreAdapter();
+    return {
+      adapter,
+      status: {
+        mode: "firebase",
+        label: `Firebase conectado: ${adapter.projectId}`,
+        tone: "ok",
+      },
     };
-    this.persist();
-    return id;
   }
 
-  async upsert(collectionName, id, value) {
-    this.ensureCollection(collectionName);
-    const index = this.database[collectionName].findIndex((item) => item.id === id);
-    const now = new Date().toISOString();
-    if (index >= 0) {
-      this.database[collectionName][index] = {
-        ...this.database[collectionName][index],
-        ...value,
-        updatedAt: now,
-      };
-    } else {
-      this.database[collectionName].push({
-        id,
-        ...value,
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
-    this.persist();
-    return id;
-  }
-
-  ensureCollection(collectionName) {
-    if (!this.database[collectionName]) {
-      this.database[collectionName] = [];
-    }
-  }
-
-  load() {
-    const rawValue = localStorage.getItem(STORAGE_KEY);
-    if (rawValue) {
-      return { ...emptyDatabase, ...JSON.parse(rawValue) };
-    }
-
-    const now = new Date().toISOString();
-    const database = {
-      ...emptyDatabase,
-      [collections.equipos]: initialEquipos.map((equipo) => ({
-        ...equipo,
-        createdAt: now,
-        updatedAt: now,
-      })),
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
-    return database;
-  }
-
-  persist() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.database));
-  }
-}
-
-function compareByDateDesc(left, right) {
-  const leftDate = new Date(left.updatedAt || left.createdAt || 0).getTime();
-  const rightDate = new Date(right.updatedAt || right.createdAt || 0).getTime();
-  return rightDate - leftDate;
+  throw new Error("Firebase no esta configurado. Complete web/firebase-config.js.");
 }
 
 export { collections, initialEquipos };

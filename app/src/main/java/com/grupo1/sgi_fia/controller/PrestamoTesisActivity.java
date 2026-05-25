@@ -1,8 +1,6 @@
 package com.grupo1.sgi_fia.controller;
 
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -10,11 +8,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 
 public class PrestamoTesisActivity extends AppCompatActivity {
 
@@ -47,12 +46,9 @@ public class PrestamoTesisActivity extends AppCompatActivity {
     private void registrarPrestamo() {
         String nombre = obtenerTexto(etNombrePrestatario);
         String carnet = "N/A";
-        String codigoTesis = "Automatico";
         String tituloTesis = obtenerTexto(etTituloTesis);
         String fechaPrestamo = obtenerTexto(etFechaPrestamo);
         String fechaDevolucion = obtenerTexto(etFechaDevolucion);
-        String estadoPrestamo = "Pendiente";
-        String observaciones = "";
 
         if (nombre.isEmpty() || tituloTesis.isEmpty() || fechaPrestamo.isEmpty()
                 || fechaDevolucion.isEmpty()) {
@@ -60,33 +56,50 @@ public class PrestamoTesisActivity extends AppCompatActivity {
             return;
         }
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getWritableDatabase();
+        SgiFirebase.upsertPrestatario(this, carnet, nombre, new SgiFirebase.Callback<String>() {
+            @Override
+            public void onSuccess(String id) {
+                guardarPrestamo(nombre, carnet, tituloTesis, fechaPrestamo, fechaDevolucion);
+            }
 
-        ContentValues registro = new ContentValues();
+            @Override
+            public void onError(Exception exception) {
+                mostrarErrorFirebase(exception);
+            }
+        });
+    }
+
+    private void guardarPrestamo(
+            String nombre,
+            String carnet,
+            String tituloTesis,
+            String fechaPrestamo,
+            String fechaDevolucion) {
+        Map<String, Object> registro = SgiFirebase.values();
         registro.put("nombre_prestatario", nombre);
         registro.put("carnet_prestatario", carnet);
-        registro.put("codigo_tesis", codigoTesis);
+        registro.put("codigo_tesis", "Automatico");
         registro.put("titulo_tesis", tituloTesis);
         registro.put("fecha_prestamo", fechaPrestamo);
         registro.put("fecha_devolucion", fechaDevolucion);
-        registro.put("estado_prestamo", estadoPrestamo);
-        registro.put("observaciones", observaciones);
+        registro.put("estado_prestamo", "Pendiente");
+        registro.put("observaciones", "");
 
-        long resultado = db.insert("prestamos_tesis", null, registro);
-        db.close();
+        SgiFirebase.add(this, SgiFirebase.PRESTAMOS_TESIS, registro,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        limpiarFormulario();
+                        Toast.makeText(PrestamoTesisActivity.this,
+                                "Prestamo de tesis registrado en Firebase",
+                                Toast.LENGTH_SHORT).show();
+                    }
 
-        if (resultado == -1) {
-            Toast.makeText(this, "No se pudo registrar el prestamo", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        limpiarFormulario();
-        Toast.makeText(this, "Prestamo de tesis registrado", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
     }
 
     private void mostrarSelectorFecha(EditText campoFecha) {
@@ -94,11 +107,16 @@ public class PrestamoTesisActivity extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> campoFecha.setText(
-                        String.format(Locale.US, "%02d/%02d/%04d", dayOfMonth, month + 1, year)),
+                        String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth)),
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH));
         dialog.show();
+    }
+
+    private void mostrarErrorFirebase(Exception exception) {
+        Toast.makeText(this, "No se pudo guardar en Firebase: " + exception.getMessage(),
+                Toast.LENGTH_LONG).show();
     }
 
     private String obtenerTexto(EditText editText) {

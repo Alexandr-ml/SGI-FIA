@@ -1,7 +1,5 @@
 package com.grupo1.sgi_fia.controller;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.inputmethod.EditorInfo;
@@ -12,8 +10,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
+
+import java.util.List;
 
 public class BusquedaHardwareLibroActivity extends AppCompatActivity {
 
@@ -51,63 +52,79 @@ public class BusquedaHardwareLibroActivity extends AppCompatActivity {
             return;
         }
 
-        boolean tieneResultados = cargarDocumentos(termino);
-        tieneResultados = cargarEquipos(termino) || tieneResultados;
-
-        if (!tieneResultados) {
-            agregarTarjeta("Libro o tesis", "descripcion del libro", R.drawable.ic_book_24);
-            agregarTarjeta("Hardware", "descripcion del hardware", R.drawable.ic_hardware_24);
-        }
+        contenedorResultados.addView(textoEstado("Buscando en Firebase"));
+        cargarDocumentos(termino);
     }
 
-    private boolean cargarDocumentos(String termino) {
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getReadableDatabase();
-        String filtro = "%" + termino + "%";
-        Cursor cursor = db.rawQuery(
-                "SELECT titulo, tipo FROM documentos WHERE titulo LIKE ? OR tipo LIKE ? ORDER BY titulo",
-                new String[]{filtro, filtro});
+    private void cargarDocumentos(String termino) {
+        SgiFirebase.list(this, SgiFirebase.DOCUMENTOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> documentos) {
+                contenedorResultados.removeAllViews();
+                int encontrados = 0;
+                String filtro = SgiFirebase.normalize(termino);
 
-        boolean tieneResultados = false;
-        while (cursor.moveToNext()) {
-            String titulo = cursor.getString(0);
-            String tipo = cursor.getString(1);
-            agregarTarjeta("Libro o tesis", tipo + ": " + titulo, R.drawable.ic_book_24);
-            tieneResultados = true;
-        }
+                for (DocumentSnapshot documento : documentos) {
+                    String titulo = SgiFirebase.string(documento, "titulo");
+                    String tipo = SgiFirebase.string(documento, "tipo");
+                    if (SgiFirebase.normalize(titulo).contains(filtro)
+                            || SgiFirebase.normalize(tipo).contains(filtro)) {
+                        agregarTarjeta("Libro o tesis", tipo + ": " + titulo, R.drawable.ic_book_24);
+                        encontrados++;
+                    }
+                }
 
-        cursor.close();
-        db.close();
-        return tieneResultados;
+                cargarEquipos(termino, encontrados);
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                contenedorResultados.removeAllViews();
+                contenedorResultados.addView(textoEstado("No se pudo consultar Firebase"));
+            }
+        });
     }
 
-    private boolean cargarEquipos(String termino) {
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getReadableDatabase();
-        String filtro = "%" + termino + "%";
-        Cursor cursor = db.rawQuery(
-                "SELECT nombre, modelo FROM equipos_informaticos WHERE nombre LIKE ? OR modelo LIKE ? ORDER BY nombre",
-                new String[]{filtro, filtro});
+    private void cargarEquipos(String termino, int encontradosPrevios) {
+        SgiFirebase.list(this, SgiFirebase.EQUIPOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> equipos) {
+                int encontrados = encontradosPrevios;
+                String filtro = SgiFirebase.normalize(termino);
 
-        boolean tieneResultados = false;
-        while (cursor.moveToNext()) {
-            String nombre = cursor.getString(0);
-            String modelo = cursor.getString(1);
-            agregarTarjeta("Hardware", nombre + " - Modelo " + modelo, R.drawable.ic_hardware_24);
-            tieneResultados = true;
-        }
+                for (DocumentSnapshot equipo : equipos) {
+                    String nombre = SgiFirebase.string(equipo, "nombre");
+                    String modelo = SgiFirebase.string(equipo, "modelo");
+                    if (SgiFirebase.normalize(nombre).contains(filtro)
+                            || SgiFirebase.normalize(modelo).contains(filtro)) {
+                        agregarTarjeta("Hardware", nombre + " - Modelo " + modelo,
+                                R.drawable.ic_hardware_24);
+                        encontrados++;
+                    }
+                }
 
-        cursor.close();
-        db.close();
-        return tieneResultados;
+                if (encontrados == 0) {
+                    agregarTarjeta("Libro o tesis", "descripcion del libro", R.drawable.ic_book_24);
+                    agregarTarjeta("Hardware", "descripcion del hardware", R.drawable.ic_hardware_24);
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                if (encontradosPrevios == 0) {
+                    contenedorResultados.addView(textoEstado("No se pudo consultar Firebase"));
+                }
+            }
+        });
+    }
+
+    private TextView textoEstado(String texto) {
+        TextView estado = new TextView(this);
+        estado.setText(texto);
+        estado.setTextColor(0xFF777777);
+        estado.setTextSize(12);
+        estado.setGravity(Gravity.CENTER);
+        return estado;
     }
 
     private void agregarTarjeta(String titulo, String descripcion, int icono) {

@@ -1,9 +1,6 @@
 package com.grupo1.sgi_fia.controller;
 
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,13 +14,17 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class LevantamientoFisicoActivity extends AppCompatActivity {
 
@@ -70,40 +71,46 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
 
     private void cargarActivos(String filtroSerie) {
         contenedorActivos.removeAllViews();
+        contenedorActivos.addView(crearFilaActivo("Cargando activos", "Firebase"));
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getReadableDatabase();
-        Cursor cursor;
-        if (filtroSerie.isEmpty()) {
-            cursor = db.rawQuery(
-                    "SELECT nombre, modelo, ubicacion, numero_serie FROM equipos_informaticos ORDER BY id_equipo LIMIT 6",
-                    null);
-        } else {
-            String filtro = "%" + filtroSerie + "%";
-            cursor = db.rawQuery(
-                    "SELECT nombre, modelo, ubicacion, numero_serie FROM equipos_informaticos WHERE numero_serie LIKE ? ORDER BY id_equipo LIMIT 6",
-                    new String[]{filtro});
-        }
+        SgiFirebase.list(this, SgiFirebase.EQUIPOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> documentos) {
+                contenedorActivos.removeAllViews();
+                String filtro = SgiFirebase.normalize(filtroSerie);
+                int agregados = 0;
 
-        while (cursor.moveToNext()) {
-            String nombre = valor(cursor, 0);
-            String modelo = valor(cursor, 1);
-            String ubicacion = valor(cursor, 2);
-            String titulo = nombre.isEmpty() ? modelo : nombre;
-            String subtitulo = ubicacion.isEmpty() ? "Ubicacion pendiente" : ubicacion;
-            contenedorActivos.addView(crearFilaActivo(titulo, subtitulo));
-        }
+                for (DocumentSnapshot documento : documentos) {
+                    String numeroSerie = SgiFirebase.string(documento, "numero_serie");
+                    if (!filtro.isEmpty() && !SgiFirebase.normalize(numeroSerie).contains(filtro)) {
+                        continue;
+                    }
 
-        cursor.close();
-        db.close();
+                    String nombre = SgiFirebase.string(documento, "nombre");
+                    String modelo = SgiFirebase.string(documento, "modelo");
+                    String ubicacion = SgiFirebase.string(documento, "ubicacion");
+                    String titulo = nombre.isEmpty() ? modelo : nombre;
+                    String subtitulo = ubicacion.isEmpty() ? "Ubicacion pendiente" : ubicacion;
+                    contenedorActivos.addView(crearFilaActivo(titulo, subtitulo));
+                    agregados++;
+                    if (agregados >= 6) {
+                        break;
+                    }
+                }
 
-        if (contenedorActivos.getChildCount() == 0) {
-            contenedorActivos.addView(crearFilaActivo("Sin activos registrados", "Agregue equipos al inventario"));
-        }
+                if (contenedorActivos.getChildCount() == 0) {
+                    contenedorActivos.addView(crearFilaActivo(
+                            "Sin activos registrados", "Agregue equipos al inventario"));
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                contenedorActivos.removeAllViews();
+                contenedorActivos.addView(crearFilaActivo(
+                        "No se pudo cargar Firebase", exception.getMessage()));
+            }
+        });
     }
 
     private View crearFilaActivo(String tituloTexto, String subtituloTexto) {
@@ -157,30 +164,76 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
             return;
         }
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getWritableDatabase();
-
-        ContentValues levantamiento = new ContentValues();
+        Map<String, Object> levantamiento = SgiFirebase.values();
         levantamiento.put("fecha_levantamiento", fecha);
         levantamiento.put("numero_serie", numeroSerie);
         levantamiento.put("observaciones", "Auditoria fisica de activos");
-        db.insert("levantamientos_fisicos", null, levantamiento);
 
-        if (numeroSerie.isEmpty()) {
-            db.execSQL("UPDATE equipos_informaticos SET fecha_ultimo_levantamiento = ?", new Object[]{fecha});
-        } else {
-            ContentValues equipo = new ContentValues();
-            equipo.put("fecha_ultimo_levantamiento", fecha);
-            db.update("equipos_informaticos", equipo, "numero_serie = ?", new String[]{numeroSerie});
+        SgiFirebase.add(this, SgiFirebase.LEVANTAMIENTOS, levantamiento,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        actualizarEquiposLevantados(fecha, numeroSerie);
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
+    }
+
+    private void actualizarEquiposLevantados(String fecha, String numeroSerie) {
+        SgiFirebase.list(this, SgiFirebase.EQUIPOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> documentos) {
+                List<DocumentSnapshot> objetivos = new ArrayList<>();
+                for (DocumentSnapshot documento : documentos) {
+                    if (numeroSerie.isEmpty()
+                            || SgiFirebase.string(documento, "numero_serie").equals(numeroSerie)) {
+                        objetivos.add(documento);
+                    }
+                }
+
+                if (objetivos.isEmpty()) {
+                    Toast.makeText(LevantamientoFisicoActivity.this,
+                            "Levantamiento registrado, sin equipos coincidentes",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
+                actualizarSiguienteEquipo(objetivos, 0, fecha);
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                mostrarErrorFirebase(exception);
+            }
+        });
+    }
+
+    private void actualizarSiguienteEquipo(List<DocumentSnapshot> objetivos, int indice, String fecha) {
+        if (indice >= objetivos.size()) {
+            Toast.makeText(this, "Levantamiento fisico finalizado en Firebase", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        db.close();
-        Toast.makeText(this, "Levantamiento fisico finalizado", Toast.LENGTH_SHORT).show();
-        finish();
+        Map<String, Object> equipo = SgiFirebase.values();
+        equipo.put("fecha_ultimo_levantamiento", fecha);
+        SgiFirebase.update(this, SgiFirebase.EQUIPOS, objetivos.get(indice).getId(), equipo,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        actualizarSiguienteEquipo(objetivos, indice + 1, fecha);
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
     }
 
     private void mostrarSelectorFecha() {
@@ -188,19 +241,20 @@ public class LevantamientoFisicoActivity extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> etFechaLevantamiento.setText(
-                        String.format(Locale.US, "%02d/%02d/%04d", dayOfMonth, month + 1, year)),
+                        String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth)),
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH));
         dialog.show();
     }
 
-    private String valor(Cursor cursor, int indice) {
-        return cursor.isNull(indice) ? "" : cursor.getString(indice);
+    private String formatearFechaActual() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
     }
 
-    private String formatearFechaActual() {
-        return new SimpleDateFormat("dd/MM/yyyy", Locale.US).format(new Date());
+    private void mostrarErrorFirebase(Exception exception) {
+        Toast.makeText(this, "No se pudo actualizar Firebase: " + exception.getMessage(),
+                Toast.LENGTH_LONG).show();
     }
 
     private int dp(int valor) {

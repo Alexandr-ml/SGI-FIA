@@ -1,8 +1,5 @@
 package com.grupo1.sgi_fia.controller;
 
-import android.content.ContentValues;
-import android.database.Cursor; // 🛠️ NUEVO: Necesario para buscar en la base de datos
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -10,15 +7,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
+
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
+
+import java.util.Map;
 
 public class RegistroDocumentosActivity extends AppCompatActivity {
 
-    private EditText etId, etTitulo, etIsbn, etIdioma, etAnio, etEjemplares;
+    private EditText etId;
+    private EditText etTitulo;
+    private EditText etIsbn;
+    private EditText etIdioma;
+    private EditText etAnio;
+    private EditText etEjemplares;
     private Spinner spinnerTipo;
-    private Button btnGuardar, btnRegresar;
+    private Button btnGuardar;
+    private Button btnRegresar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +45,15 @@ public class RegistroDocumentosActivity extends AppCompatActivity {
         btnRegresar = findViewById(R.id.btnRegresar);
 
         String[] opcionesDocumento = {"Libro", "Tesis"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, opcionesDocumento);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                opcionesDocumento);
         spinnerTipo.setAdapter(adapter);
 
         if (etId != null) {
             etId.setEnabled(false);
-            etId.setHint("ID: Automático");
+            etId.setHint("ID: Automatico");
         }
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
@@ -61,87 +72,123 @@ public class RegistroDocumentosActivity extends AppCompatActivity {
     }
 
     private void registrarDocumento() {
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase bd = admin.getWritableDatabase();
-
         String titulo = etTitulo.getText().toString().trim();
         String isbn = etIsbn.getText().toString().trim();
         String idioma = etIdioma.getText().toString().trim();
         String anioStr = etAnio.getText().toString().trim();
-        String ejemplaresStr = (etEjemplares != null) ? etEjemplares.getText().toString().trim() : "";
+        String ejemplaresStr = etEjemplares != null ? etEjemplares.getText().toString().trim() : "";
         String tipo = spinnerTipo.getSelectedItem() != null ? spinnerTipo.getSelectedItem().toString() : "";
 
-        if (!titulo.isEmpty() && !tipo.isEmpty()) {
-
-            int anio = !anioStr.isEmpty() ? Integer.parseInt(anioStr) : 0;
-            int nuevosEjemplares = (!ejemplaresStr.isEmpty()) ? Integer.parseInt(ejemplaresStr) : 1;
-
-            // 🛠️ LÓGICA DE CONTROL: Buscamos si ya existe un documento idéntico
-            // Hacemos un SELECT filtrando por titulo, anio, isbn y tipo
-            Cursor cursor = bd.rawQuery(
-                    "SELECT id_documento, ejemplares FROM documentos WHERE titulo=? AND anio=? AND isbn=? AND tipo=?",
-                    new String[]{titulo, String.valueOf(anio), isbn, tipo}
-            );
-
-            if (cursor.moveToFirst()) {
-                // 💥 ¡SÍ EXISTE! Encontró una coincidencia exacta.
-                int idExistente = cursor.getInt(0);
-                int ejemplaresActuales = cursor.getInt(1);
-                cursor.close(); // Cerramos el cursor rápido
-
-                // Sumamos el stock actual más lo que el usuario acaba de digitar
-                int stockActualizado = ejemplaresActuales + nuevosEjemplares;
-
-                ContentValues actualizacion = new ContentValues();
-                actualizacion.put("ejemplares", stockActualizado);
-
-                // Ejecutamos el UPDATE en base al ID que encontramos
-                bd.update("documentos", actualizacion, "id_documento=" + idExistente, null);
-                bd.close();
-
-                Toast.makeText(this, "¡Libro existente! ID: " + idExistente + " incrementó stock a: " + stockActualizado, Toast.LENGTH_LONG).show();
-
-            } else {
-                // 📝 ¡NO EXISTE! Es un libro completamente nuevo.
-                cursor.close();
-
-                ContentValues registro = new ContentValues();
-                registro.put("titulo", titulo);
-                registro.put("tipo", tipo);
-                registro.put("isbn", isbn);
-                registro.put("idioma", idioma);
-                registro.put("anio", anio);
-                registro.put("ejemplares", nuevosEjemplares);
-
-                long nuevoId = bd.insert("documentos", null, registro);
-                bd.close();
-
-                if (nuevoId != -1) {
-                    Toast.makeText(this, "¡Nuevo registro! ID asignado: " + nuevoId + " (" + nuevosEjemplares + " ej.)", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "Error crítico al intentar insertar en la base de datos", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-
-            // Limpieza de pantalla (se ejecuta en ambos casos tras un éxito)
-            if (etId != null) {
-                etId.setText("");
-                etId.setHint("ID: Automático");
-            }
-            etTitulo.setText("");
-            etIsbn.setText("");
-            etIdioma.setText("");
-            etAnio.setText("");
-            if (etEjemplares != null) etEjemplares.setText("");
-            spinnerTipo.setSelection(0);
-
-        } else {
-            Toast.makeText(this, "Por favor, ingresa al menos el Título", Toast.LENGTH_SHORT).show();
+        if (titulo.isEmpty() || tipo.isEmpty()) {
+            Toast.makeText(this, "Por favor, ingresa al menos el titulo", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        int anio;
+        int nuevosEjemplares;
+        try {
+            anio = !anioStr.isEmpty() ? Integer.parseInt(anioStr) : 0;
+            nuevosEjemplares = !ejemplaresStr.isEmpty() ? Integer.parseInt(ejemplaresStr) : 1;
+        } catch (NumberFormatException exception) {
+            Toast.makeText(this, "Anio y ejemplares deben ser numericos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SgiFirebase.findFirst(
+                this,
+                SgiFirebase.DOCUMENTOS,
+                documento -> SgiFirebase.equalsNormalized(SgiFirebase.string(documento, "titulo"), titulo)
+                        && SgiFirebase.equalsNormalized(SgiFirebase.string(documento, "tipo"), tipo)
+                        && SgiFirebase.equalsNormalized(SgiFirebase.string(documento, "isbn"), isbn)
+                        && SgiFirebase.integer(documento, "anio", 0) == anio,
+                new SgiFirebase.Callback<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot existente) {
+                        if (existente != null) {
+                            actualizarStock(existente, nuevosEjemplares);
+                        } else {
+                            crearDocumento(titulo, tipo, isbn, idioma, anio, nuevosEjemplares);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        Toast.makeText(RegistroDocumentosActivity.this,
+                                "No se pudo consultar Firebase: " + exception.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void actualizarStock(DocumentSnapshot existente, int nuevosEjemplares) {
+        int stockActualizado = SgiFirebase.integer(existente, "ejemplares", 0) + nuevosEjemplares;
+        Map<String, Object> actualizacion = SgiFirebase.values();
+        actualizacion.put("ejemplares", stockActualizado);
+
+        SgiFirebase.update(this, SgiFirebase.DOCUMENTOS, existente.getId(), actualizacion,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        limpiarFormulario();
+                        Toast.makeText(RegistroDocumentosActivity.this,
+                                "Documento existente actualizado. Stock: " + stockActualizado,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        Toast.makeText(RegistroDocumentosActivity.this,
+                                "No se pudo actualizar Firebase: " + exception.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void crearDocumento(
+            String titulo,
+            String tipo,
+            String isbn,
+            String idioma,
+            int anio,
+            int nuevosEjemplares) {
+        Map<String, Object> registro = SgiFirebase.values();
+        registro.put("titulo", titulo);
+        registro.put("tipo", tipo);
+        registro.put("isbn", isbn);
+        registro.put("idioma", idioma);
+        registro.put("anio", anio);
+        registro.put("ejemplares", nuevosEjemplares);
+
+        SgiFirebase.add(this, SgiFirebase.DOCUMENTOS, registro, new SgiFirebase.Callback<String>() {
+            @Override
+            public void onSuccess(String id) {
+                limpiarFormulario();
+                Toast.makeText(RegistroDocumentosActivity.this,
+                        "Documento registrado en Firebase. ID: " + id,
+                        Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Toast.makeText(RegistroDocumentosActivity.this,
+                        "No se pudo guardar en Firebase: " + exception.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void limpiarFormulario() {
+        if (etId != null) {
+            etId.setText("");
+            etId.setHint("ID: Automatico");
+        }
+        etTitulo.setText("");
+        etIsbn.setText("");
+        etIdioma.setText("");
+        etAnio.setText("");
+        if (etEjemplares != null) {
+            etEjemplares.setText("");
+        }
+        spinnerTipo.setSelection(0);
     }
 }

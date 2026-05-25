@@ -2,9 +2,6 @@ package com.grupo1.sgi_fia.controller;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -16,13 +13,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
 
@@ -33,6 +33,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private LinearLayout contenedorEquipos;
     private final List<String> equiposRegistrados = new ArrayList<>();
     private final List<String> equiposSeleccionados = new ArrayList<>();
+    private final Map<String, String> equipoIdsPorEtiqueta = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +68,9 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         String fecha = obtenerTexto(etFechaPrestamo);
         String horaInicio = obtenerTexto(etHoraInicio);
         String horaFin = obtenerTexto(etHoraFin);
-        String actividad = "Prestamo por horas";
-        String observaciones = "";
 
         if (equiposRegistrados.isEmpty()) {
-            Toast.makeText(this, "No hay equipos registrados", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No hay equipos registrados en Firebase", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -85,33 +84,52 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
             return;
         }
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getWritableDatabase();
+        SgiFirebase.upsertPrestatario(this, carnet, nombre, new SgiFirebase.Callback<String>() {
+            @Override
+            public void onSuccess(String id) {
+                guardarPrestamo(nombre, carnet, equipo, fecha, horaInicio, horaFin);
+            }
 
-        ContentValues registro = new ContentValues();
+            @Override
+            public void onError(Exception exception) {
+                mostrarErrorFirebase(exception);
+            }
+        });
+    }
+
+    private void guardarPrestamo(
+            String nombre,
+            String carnet,
+            String equipo,
+            String fecha,
+            String horaInicio,
+            String horaFin) {
+        Map<String, Object> registro = SgiFirebase.values();
         registro.put("nombre_prestatario", nombre);
         registro.put("carnet_prestatario", carnet);
         registro.put("equipo", equipo);
+        registro.put("equipos_ids", obtenerIdsEquiposSeleccionados());
         registro.put("fecha_prestamo", fecha);
         registro.put("hora_inicio", horaInicio);
         registro.put("hora_fin", horaFin);
-        registro.put("actividad", actividad);
-        registro.put("observaciones", observaciones);
+        registro.put("actividad", "Prestamo por horas");
+        registro.put("observaciones", "");
 
-        long resultado = db.insert("prestamos_equipo_horas", null, registro);
-        db.close();
+        SgiFirebase.add(this, SgiFirebase.PRESTAMOS_EQUIPO_HORAS, registro,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        limpiarFormulario();
+                        Toast.makeText(PrestamoEquipoPorHorasActivity.this,
+                                "Prestamo de equipo registrado en Firebase",
+                                Toast.LENGTH_SHORT).show();
+                    }
 
-        if (resultado == -1) {
-            Toast.makeText(this, "No se pudo registrar el prestamo", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        limpiarFormulario();
-        Toast.makeText(this, "Prestamo de equipo registrado", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
     }
 
     private void mostrarSelectorFecha(EditText campoFecha) {
@@ -119,7 +137,7 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> campoFecha.setText(
-                        String.format(Locale.US, "%02d/%02d/%04d", dayOfMonth, month + 1, year)),
+                        String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth)),
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH));
@@ -154,32 +172,36 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
     private void cargarEquiposRegistrados() {
         contenedorEquipos.removeAllViews();
         equiposRegistrados.clear();
+        equipoIdsPorEtiqueta.clear();
+        contenedorEquipos.addView(crearFilaEquipo("Cargando equipos", "Firebase", ""));
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getReadableDatabase();
-        Cursor cursor = db.rawQuery(
-                "SELECT nombre, modelo FROM equipos_informaticos ORDER BY id_equipo",
-                null);
+        SgiFirebase.list(this, SgiFirebase.EQUIPOS, new SgiFirebase.Callback<List<DocumentSnapshot>>() {
+            @Override
+            public void onSuccess(List<DocumentSnapshot> documentos) {
+                contenedorEquipos.removeAllViews();
+                for (DocumentSnapshot documento : documentos) {
+                    String nombre = SgiFirebase.string(documento, "nombre");
+                    String modelo = SgiFirebase.string(documento, "modelo");
+                    String modeloFormateado = formatearModelo(modelo);
+                    String equipo = nombre + " - " + modeloFormateado;
+                    equiposRegistrados.add(equipo);
+                    equipoIdsPorEtiqueta.put(equipo, documento.getId());
+                    contenedorEquipos.addView(crearFilaEquipo(nombre, modeloFormateado, equipo));
+                }
 
-        while (cursor.moveToNext()) {
-            String nombre = cursor.getString(0);
-            String modelo = cursor.getString(1);
-            String modeloFormateado = formatearModelo(modelo);
-            String equipo = nombre + " - " + modeloFormateado;
-            equiposRegistrados.add(equipo);
-            contenedorEquipos.addView(crearFilaEquipo(nombre, modeloFormateado, equipo));
-        }
+                if (equiposRegistrados.isEmpty()) {
+                    contenedorEquipos.addView(crearFilaEquipo(
+                            "Sin equipos registrados", "Revise Firebase", ""));
+                }
+            }
 
-        cursor.close();
-        db.close();
-
-        if (equiposRegistrados.isEmpty()) {
-            contenedorEquipos.addView(crearFilaEquipo("Sin equipos registrados", "Revise SGIFIA.db", ""));
-        }
+            @Override
+            public void onError(Exception exception) {
+                contenedorEquipos.removeAllViews();
+                contenedorEquipos.addView(crearFilaEquipo(
+                        "No se pudo cargar Firebase", exception.getMessage(), ""));
+            }
+        });
     }
 
     private View crearFilaEquipo(String nombre, String modelo, String equipo) {
@@ -243,7 +265,21 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
         return String.join("; ", equiposSeleccionados);
     }
 
+    private List<String> obtenerIdsEquiposSeleccionados() {
+        List<String> ids = new ArrayList<>();
+        for (String equipo : equiposSeleccionados) {
+            String id = equipoIdsPorEtiqueta.get(equipo);
+            if (id != null) {
+                ids.add(id);
+            }
+        }
+        return ids;
+    }
+
     private String formatearModelo(String modelo) {
+        if (modelo == null || modelo.trim().isEmpty()) {
+            return "Modelo pendiente";
+        }
         if (modelo.startsWith("Modelo ")) {
             return modelo;
         }
@@ -275,5 +311,10 @@ public class PrestamoEquipoPorHorasActivity extends AppCompatActivity {
             return;
         }
         Toast.makeText(this, "Equipo agregado al prestamo", Toast.LENGTH_SHORT).show();
+    }
+
+    private void mostrarErrorFirebase(Exception exception) {
+        Toast.makeText(this, "No se pudo guardar en Firebase: " + exception.getMessage(),
+                Toast.LENGTH_LONG).show();
     }
 }

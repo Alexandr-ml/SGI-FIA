@@ -1,7 +1,5 @@
 package com.grupo1.sgi_fia.controller;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -11,8 +9,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
+
+import java.util.Map;
 
 public class AgregarEquipoInformaticoActivity extends AppCompatActivity {
 
@@ -77,17 +77,9 @@ public class AgregarEquipoInformaticoActivity extends AppCompatActivity {
             Toast.makeText(this, "Ingrese un costo valido", Toast.LENGTH_SHORT).show();
             return;
         }
-        String nombre = marca + " " + modelo;
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
-                this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getWritableDatabase();
-
-        ContentValues equipo = new ContentValues();
-        equipo.put("nombre", nombre);
+        Map<String, Object> equipo = SgiFirebase.values();
+        equipo.put("nombre", marca + " " + modelo);
         equipo.put("numero_serie", numeroSerie);
         equipo.put("marca", marca);
         equipo.put("modelo", modelo);
@@ -98,16 +90,21 @@ public class AgregarEquipoInformaticoActivity extends AppCompatActivity {
         equipo.put("estado_funcional", "Activo");
         equipo.put("estado_prestamo", "Disponible");
 
-        long resultado = db.insert("equipos_informaticos", null, equipo);
-        db.close();
+        SgiFirebase.add(this, SgiFirebase.EQUIPOS, equipo, new SgiFirebase.Callback<String>() {
+            @Override
+            public void onSuccess(String id) {
+                limpiarFormulario();
+                Toast.makeText(AgregarEquipoInformaticoActivity.this,
+                        "Equipo informatico agregado en Firebase", Toast.LENGTH_SHORT).show();
+            }
 
-        if (resultado == -1) {
-            Toast.makeText(this, "No se pudo guardar el equipo", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        limpiarFormulario();
-        Toast.makeText(this, "Equipo informatico agregado", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(Exception exception) {
+                Toast.makeText(AgregarEquipoInformaticoActivity.this,
+                        "No se pudo guardar en Firebase: " + exception.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void limpiarFormulario() {

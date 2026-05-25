@@ -1,4 +1,4 @@
-import { firebaseConfig, firebaseOptions } from "../firebase-config.js";
+import { firebaseConfig } from "../firebase-config.js";
 
 const FIREBASE_VERSION = "12.13.0";
 const FIREBASE_APP_URL = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-app.js`;
@@ -28,16 +28,16 @@ export function hasFirebaseConfig() {
   );
 }
 
-export function canUseLocalFallback() {
-  return firebaseOptions.enableLocalFallback !== false;
-}
-
 async function loadSdk() {
   if (!sdkPromise) {
     sdkPromise = Promise.all([import(FIREBASE_APP_URL), import(FIREBASE_FIRESTORE_URL)]);
   }
   const [appSdk, firestoreSdk] = await sdkPromise;
   return { ...appSdk, ...firestoreSdk };
+}
+
+async function assertFirestoreAvailable(sdk, db) {
+  await sdk.getDocs(sdk.query(sdk.collection(db, collections.documentos), sdk.limit(1)));
 }
 
 export async function createFirestoreAdapter() {
@@ -50,6 +50,8 @@ export async function createFirestoreAdapter() {
     ? sdk.getApps()[0]
     : sdk.initializeApp(firebaseConfig);
   const db = sdk.getFirestore(app);
+
+  await assertFirestoreAvailable(sdk, db);
 
   return {
     mode: "firebase",

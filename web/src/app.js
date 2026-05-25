@@ -401,10 +401,7 @@ function renderLoanForm() {
           <span>Carnet</span>
           <input name="carnet_prestatario" autocomplete="off" placeholder="N/A" />
         </label>
-        <label class="full-field">
-          <span>Titulo tesis</span>
-          <input name="titulo_tesis" required autocomplete="off" />
-        </label>
+        ${renderThesisSelector()}
         <label>
           <span>Fecha prestamo</span>
           <input name="fecha_prestamo" required type="date" value="${todayISO()}" />
@@ -526,6 +523,7 @@ function renderLoanForm() {
         <button class="primary-button" type="submit">Registrar libro</button>
       </div>
     </form>
+    ${renderAvailableBooks()}
   `;
 }
 
@@ -540,9 +538,11 @@ function renderDevoluciones() {
         ${renderSegmentedControl("return", state.returnMode, [
           ["libro", "Libro"],
           ["tesis", "Tesis"],
+          ["equipoHoras", "Equipo por horas"],
+          ["recurrente", "Recurrente"],
         ])}
       </div>
-      ${state.returnMode === "tesis" ? renderThesisReturnForm() : renderBookReturnForm()}
+      ${renderReturnForm()}
     </section>
 
     <section class="work-panel">
@@ -558,6 +558,19 @@ function renderDevoluciones() {
   `;
 }
 
+function renderReturnForm() {
+  if (state.returnMode === "tesis") {
+    return renderThesisReturnForm();
+  }
+  if (state.returnMode === "equipoHoras") {
+    return renderEquipmentHoursReturnForm();
+  }
+  if (state.returnMode === "recurrente") {
+    return renderRecurrentReturnForm();
+  }
+  return renderBookReturnForm();
+}
+
 function renderBookReturnForm() {
   const pending = state.data.prestamos.filter((prestamo) => prestamo.estado !== "Devuelto");
   return `
@@ -570,6 +583,50 @@ function renderBookReturnForm() {
             .map(
               (prestamo) =>
                 `<option value="${prestamo.id}">${escapeHtml(loanLabel(prestamo))}</option>`,
+            )
+            .join("")}
+        </select>
+      </label>
+      <label>
+        <span>Fecha devolucion</span>
+        <input name="fecha_devolucion" required type="date" value="${todayISO()}" />
+      </label>
+      <label class="checkbox-field">
+        <input name="marcar_devuelto" type="checkbox" required />
+        <span>Marcar como devuelto</span>
+      </label>
+      <div class="form-actions">
+        <button class="primary-button" type="submit">Registrar devolucion</button>
+      </div>
+    </form>
+  `;
+}
+
+function renderEquipmentHoursReturnForm() {
+  const pending = state.data.prestamosEquipoHoras.filter(
+    (prestamo) => prestamo.estado_prestamo !== "Devuelto",
+  );
+  return renderEquipmentReturnForm("devolucion-equipo-horas", "Prestamo equipo por horas", pending);
+}
+
+function renderRecurrentReturnForm() {
+  const pending = state.data.prestamosEquipoRecurrente.filter(
+    (prestamo) => prestamo.estado_prestamo !== "Devuelto",
+  );
+  return renderEquipmentReturnForm("devolucion-recurrente", "Prestamo recurrente", pending);
+}
+
+function renderEquipmentReturnForm(action, label, pending) {
+  return `
+    <form class="form-grid" data-action="${action}">
+      <label class="full-field">
+        <span>${label}</span>
+        <select name="id_prestamo" required>
+          <option value="">Seleccione prestamo</option>
+          ${pending
+            .map(
+              (prestamo) =>
+                `<option value="${prestamo.id}">${escapeHtml(equipmentLoanLabel(prestamo))}</option>`,
             )
             .join("")}
         </select>
@@ -671,6 +728,17 @@ function renderLevantamiento() {
             : `<p class="empty-state">Sin activos para el filtro actual.</p>`
         }
       </div>
+    </section>
+
+    <section class="work-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Historial</p>
+          <h3>Auditorias registradas</h3>
+        </div>
+        <span class="count-pill">${state.data.levantamientos.length}</span>
+      </div>
+      ${renderAuditHistory(state.data.levantamientos)}
     </section>
   `;
 }
@@ -779,6 +847,8 @@ async function handleSubmit(event) {
     "prestamo-recurrente": handlePrestamoRecurrente,
     "devolucion-libro": handleDevolucionLibro,
     "devolucion-tesis": handleDevolucionTesis,
+    "devolucion-equipo-horas": handleDevolucionEquipoHoras,
+    "devolucion-recurrente": handleDevolucionRecurrente,
     levantamiento: handleLevantamiento,
   };
 
@@ -881,10 +951,8 @@ async function handlePrestamoLibro(form) {
     throw new Error("Complete los campos obligatorios.");
   }
 
-  await upsertPrestatario(carnet, nombre);
-
   let documento = state.data.documentos.find(
-    (item) => item.tipo === "Libro" && normalizeText(item.titulo) === normalizeText(titulo),
+    (item) => normalizeText(item.tipo) === "libro" && normalizeText(item.titulo) === normalizeText(titulo),
   );
   let documentId = documento?.id;
 
@@ -897,7 +965,15 @@ async function handlePrestamoLibro(form) {
       anio: 0,
       ejemplares: 1,
     });
+    documento = { id: documentId, ejemplares: 1 };
   }
+
+  const ejemplaresActual = Number(documento?.ejemplares || 0);
+  if (ejemplaresActual <= 0) {
+    throw new Error("No hay ejemplares disponibles para este libro.");
+  }
+  await upsertPrestatario(carnet, nombre);
+  await repository.update(collections.documentos, documentId, { ejemplares: ejemplaresActual - 1 });
 
   await repository.add(collections.prestamos, {
     carnet_prestatario: carnet,
@@ -908,7 +984,7 @@ async function handlePrestamoLibro(form) {
     fecha_limite: fechaLimite,
     estado: "Pendiente",
   });
-  showToast("Prestamo de libro registrado.", "ok");
+  showToast("Prestamo de libro registrado. Ejemplares actualizados.", "ok");
 }
 
 async function handlePrestamoTesis(form) {
@@ -923,7 +999,23 @@ async function handlePrestamoTesis(form) {
     throw new Error("Complete los campos obligatorios.");
   }
 
+  const documento = state.data.documentos.find(
+    (d) => normalizeText(d.tipo) === "tesis" && normalizeText(d.titulo) === normalizeText(titulo),
+  );
+
+  if (!documento) {
+    throw new Error("Tesis no encontrada en el catalogo. Registre la tesis antes de prestarla.");
+  }
+
+  const ejemplaresActual = Number(documento.ejemplares || 0);
+  if (ejemplaresActual <= 0) {
+    throw new Error("No hay ejemplares disponibles para esta tesis.");
+  }
+
   await upsertPrestatario(carnet, nombre);
+  const nuevosEjemplares = ejemplaresActual - 1;
+  await repository.update(collections.documentos, documento.id, { ejemplares: nuevosEjemplares });
+
   await repository.add(collections.prestamosTesis, {
     nombre_prestatario: nombre,
     carnet_prestatario: carnet,
@@ -934,7 +1026,7 @@ async function handlePrestamoTesis(form) {
     estado_prestamo: "Pendiente",
     observaciones: clean(data.observaciones),
   });
-  showToast("Prestamo de tesis registrado.", "ok");
+  showToast("Prestamo de tesis registrado. Ejemplares actualizados.", "ok");
 }
 
 async function handlePrestamoEquipoHoras(form) {
@@ -951,6 +1043,12 @@ async function handlePrestamoEquipoHoras(form) {
     throw new Error("Complete los campos obligatorios.");
   }
 
+  const equiposObjs = equipos.map((e) => state.data.equipos.find((it) => it.id === e.id)).filter(Boolean);
+  const unavailable = equiposObjs.filter((eq) => normalizeText(eq.estado_prestamo || "") !== "disponible");
+  if (unavailable.length) {
+    throw new Error(`Los siguientes equipos no estan disponibles: ${unavailable.map((e) => e.nombre).join(", ")}`);
+  }
+
   await upsertPrestatario(carnet, nombre);
   await repository.add(collections.prestamosEquipoHoras, {
     nombre_prestatario: nombre,
@@ -961,9 +1059,11 @@ async function handlePrestamoEquipoHoras(form) {
     hora_inicio: clean(data.hora_inicio),
     hora_fin: clean(data.hora_fin),
     actividad: clean(data.actividad) || "Prestamo por horas",
+    estado_prestamo: "Pendiente",
     observaciones: clean(data.observaciones),
   });
-  showToast("Prestamo de equipo registrado.", "ok");
+  await markEquipmentState(equipos.map((equipo) => equipo.id), "Prestado");
+  showToast("Prestamo de equipo registrado. Equipos marcados como Prestado.", "ok");
 }
 
 async function handlePrestamoRecurrente(form) {
@@ -980,6 +1080,12 @@ async function handlePrestamoRecurrente(form) {
     throw new Error("Complete los campos obligatorios.");
   }
 
+  const equiposObjs = equipos.map((e) => state.data.equipos.find((it) => it.id === e.id)).filter(Boolean);
+  const unavailable = equiposObjs.filter((eq) => normalizeText(eq.estado_prestamo || "") !== "disponible");
+  if (unavailable.length) {
+    throw new Error(`Los siguientes equipos no estan disponibles: ${unavailable.map((e) => e.nombre).join(", ")}`);
+  }
+
   await upsertPrestatario(carnet, nombre);
   await repository.add(collections.prestamosEquipoRecurrente, {
     nombre_prestatario: nombre,
@@ -991,7 +1097,8 @@ async function handlePrestamoRecurrente(form) {
     estado_prestamo: "Pendiente",
     observaciones: clean(data.observaciones),
   });
-  showToast("Prestamo recurrente registrado.", "ok");
+  await markEquipmentState(equipos.map((equipo) => equipo.id), "Prestado");
+  showToast("Prestamo recurrente registrado. Equipos marcados como Prestado.", "ok");
 }
 
 async function handleDevolucionLibro(form) {
@@ -1012,6 +1119,20 @@ async function handleDevolucionLibro(form) {
     fecha_devolucion: clean(data.fecha_devolucion),
   });
   await repository.update(collections.prestamos, prestamo.id, { estado: "Devuelto" });
+
+  // Incrementar ejemplares del documento asociado (si existe)
+  try {
+    if (prestamo.id_documento) {
+      const doc = state.data.documentos.find((d) => d.id === prestamo.id_documento);
+      if (doc) {
+        const actuales = Number(doc.ejemplares || 0);
+        await repository.update(collections.documentos, doc.id, { ejemplares: actuales + 1 });
+      }
+    }
+  } catch (err) {
+    // no bloquear la devolución por error en inventario
+    console.warn("Error actualizando ejemplares al devolver libro:", err);
+  }
   showToast("Devolucion registrada.", "ok");
 }
 
@@ -1036,7 +1157,60 @@ async function handleDevolucionTesis(form) {
   await repository.update(collections.prestamosTesis, prestamo.id, {
     estado_prestamo: "Devuelto",
   });
+  // Incrementar ejemplares de la tesis en el catalogo (si existe)
+  try {
+    const documento = state.data.documentos.find(
+      (d) => normalizeText(d.tipo) === "tesis" && normalizeText(d.titulo) === normalizeText(prestamo.titulo_tesis),
+    );
+    if (documento) {
+      const actuales = Number(documento.ejemplares || 0);
+      await repository.update(collections.documentos, documento.id, { ejemplares: actuales + 1 });
+    }
+  } catch (err) {
+    console.warn("Error actualizando ejemplares al devolver tesis:", err);
+  }
   showToast("Devolucion de tesis registrada.", "ok");
+}
+
+async function handleDevolucionEquipoHoras(form) {
+  await handleEquipmentReturn(
+    form,
+    collections.prestamosEquipoHoras,
+    state.data.prestamosEquipoHoras,
+    "Equipo por horas",
+  );
+}
+
+async function handleDevolucionRecurrente(form) {
+  await handleEquipmentReturn(
+    form,
+    collections.prestamosEquipoRecurrente,
+    state.data.prestamosEquipoRecurrente,
+    "Equipo recurrente",
+  );
+}
+
+async function handleEquipmentReturn(form, loanCollection, loans, loanType) {
+  const data = formData(form);
+  const prestamo = loans.find((item) => item.id === data.id_prestamo);
+
+  if (!prestamo) {
+    throw new Error("Seleccione un prestamo valido.");
+  }
+
+  if (data.marcar_devuelto !== "on") {
+    throw new Error("Marque la casilla de devolucion.");
+  }
+
+  await repository.add(collections.devoluciones, {
+    id_prestamo: prestamo.id,
+    tipo_prestamo: loanType,
+    marcar_devuelto: true,
+    fecha_devolucion: clean(data.fecha_devolucion),
+  });
+  await repository.update(loanCollection, prestamo.id, { estado_prestamo: "Devuelto" });
+  await markEquipmentState(prestamo.equipos_ids || [], "Disponible");
+  showToast("Devolucion de equipo registrada.", "ok");
 }
 
 async function handleLevantamiento(form) {
@@ -1067,6 +1241,16 @@ async function handleLevantamiento(form) {
   );
   state.physicalFilter = "";
   showToast("Levantamiento fisico finalizado.", "ok");
+}
+
+async function markEquipmentState(equipmentIds, estadoPrestamo) {
+  await Promise.all(
+    equipmentIds.map((id) =>
+      repository.update(collections.equipos, id, {
+        estado_prestamo: estadoPrestamo,
+      }),
+    ),
+  );
 }
 
 async function seedInitialEquipment() {
@@ -1228,6 +1412,57 @@ function renderEquipmentTable(equipos) {
   `;
 }
 
+function renderAuditHistory(levantamientos) {
+  if (!levantamientos.length) {
+    return `<p class="empty-state">Sin auditorias registradas.</p>`;
+  }
+
+  const rows = [...levantamientos].sort((left, right) => {
+    const leftDate = sortableDate(left.fecha_levantamiento || left.updatedAt || left.createdAt);
+    const rightDate = sortableDate(right.fecha_levantamiento || right.updatedAt || right.createdAt);
+    return rightDate - leftDate;
+  });
+
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Alcance</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (levantamiento) => `
+                <tr>
+                  <td>${escapeHtml(formatDate(levantamiento.fecha_levantamiento))}</td>
+                  <td>${escapeHtml(auditScope(levantamiento))}</td>
+                  <td>${escapeHtml(levantamiento.observaciones || "Sin observaciones")}</td>
+                </tr>
+              `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function auditScope(levantamiento) {
+  return levantamiento.numero_serie
+    ? `Serie ${levantamiento.numero_serie}`
+    : "Inventario completo";
+}
+
+function sortableDate(value) {
+  const date = new Date(value || 0);
+  const time = date.getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
 function renderEquipmentPicker() {
   if (!state.data.equipos.length) {
     return `<p class="empty-state full-field">Sin equipos registrados.</p>`;
@@ -1239,19 +1474,84 @@ function renderEquipmentPicker() {
       <div class="picker-grid">
         ${state.data.equipos
           .map(
-            (equipo) => `
+            (equipo) => {
+              const disabled = equipo.estado_prestamo && normalizeText(equipo.estado_prestamo) !== "disponible";
+              return `
               <label>
-                <input type="checkbox" name="equipos" value="${equipo.id}" />
+                <input type="checkbox" name="equipos" value="${equipo.id}" ${disabled ? 'disabled' : ''} />
                 <span>
                   <strong>${escapeHtml(equipo.nombre || `${equipo.marca} ${equipo.modelo}`)}</strong>
                   <small>${escapeHtml(equipo.numero_serie || equipo.modelo || "Sin serie")}</small>
                 </span>
+                <small class="box-sub">${escapeHtml(equipo.estado_prestamo || 'Disponible')}</small>
               </label>
-            `,
+            `;
+            },
           )
           .join("")}
       </div>
     </fieldset>
+  `;
+}
+
+function renderAvailableBooks() {
+  const libros = state.data.documentos.filter((d) => d.tipo === "Libro");
+  if (!libros.length) return "";
+  const available = libros.filter((d) => Number(d.ejemplares || 0) > 0);
+  return `
+    <section class="work-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Disponibilidad</p>
+          <h3>Libros disponibles</h3>
+        </div>
+        <span class="count-pill">${available.length}</span>
+      </div>
+      <div class="box-grid staggered">
+        ${libros
+          .map(
+            (doc) => `
+              <article class="box">
+                <div class="box-title">${escapeHtml(doc.titulo)}</div>
+                <div class="box-sub">Ejemplares: ${escapeHtml(String(doc.ejemplares || 0))}</div>
+                <div style="margin-top:8px"><span class="state-badge ${badgeClass(Number(doc.ejemplares || 0) > 0 ? 'Disponible' : 'Agotado')}">${escapeHtml(Number(doc.ejemplares || 0) > 0 ? 'Disponible' : 'Agotado')}</span></div>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderThesisSelector() {
+  const tesis = state.data.documentos.filter((d) => normalizeText(d.tipo) === "tesis");
+  if (!tesis.length) {
+    return `
+      <label class="full-field">
+        <span>Titulo tesis</span>
+        <input name="titulo_tesis" required autocomplete="off" placeholder="No hay tesis registradas, ingrese titulo" />
+      </label>
+    `;
+  }
+
+  const available = tesis.filter((t) => Number(t.ejemplares || 0) > 0);
+  return `
+    <label class="full-field">
+      <span>Titulo tesis</span>
+      <select name="titulo_tesis" required>
+        <option value="">Seleccione tesis</option>
+        ${tesis
+          .map(
+            (t) =>
+              `<option value="${escapeHtml(t.titulo)}" ${Number(t.ejemplares || 0) === 0 ? 'disabled' : ''}>${escapeHtml(
+                t.titulo,
+              )} (${escapeHtml(String(t.ejemplares || 0))} ej.)</option>`,
+          )
+          .join("")}
+      </select>
+      ${available.length === 0 ? `<small class="box-sub">No hay ejemplares disponibles</small>` : ``}
+    </label>
   `;
 }
 
@@ -1293,7 +1593,7 @@ function renderLoanHistory() {
       titulo: prestamo.equipo,
       prestatario: prestamo.nombre_prestatario,
       fecha: prestamo.fecha_prestamo,
-      estado: "Registrado",
+      estado: prestamo.estado_prestamo || "Pendiente",
     })),
     ...state.data.prestamosEquipoRecurrente.map((prestamo) => ({
       tipo: "Recurrente",
@@ -1470,6 +1770,15 @@ function pendingLoans() {
         person: prestamo.nombre_prestatario,
         date: prestamo.fecha_devolucion,
       })),
+    ...state.data.prestamosEquipoHoras
+      .filter((prestamo) => prestamo.estado_prestamo !== "Devuelto")
+      .map((prestamo) => ({
+        id: prestamo.id,
+        type: "Equipo horas",
+        title: prestamo.equipo,
+        person: prestamo.nombre_prestatario,
+        date: prestamo.fecha_prestamo,
+      })),
     ...state.data.prestamosEquipoRecurrente
       .filter((prestamo) => prestamo.estado_prestamo !== "Devuelto")
       .map((prestamo) => ({
@@ -1506,6 +1815,10 @@ function loanLabel(prestamo) {
 
 function thesisLoanLabel(prestamo) {
   return `${prestamo.titulo_tesis || "Tesis"} - ${prestamo.nombre_prestatario || "N/A"} - ${formatDate(prestamo.fecha_prestamo)}`;
+}
+
+function equipmentLoanLabel(prestamo) {
+  return `${prestamo.equipo || "Equipo"} - ${prestamo.nombre_prestatario || "N/A"} - ${formatDate(prestamo.fecha_prestamo || prestamo.fecha_inicio)}`;
 }
 
 function badgeClass(value = "") {

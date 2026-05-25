@@ -37,8 +37,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.room:room-runtime-android:2.8.4")
-    annotationProcessor("androidx.room:room-compiler:2.8.4")
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    implementation("com.google.firebase:firebase-firestore")
 
     implementation(libs.appcompat)
     implementation(libs.material)

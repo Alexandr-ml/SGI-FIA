@@ -1,9 +1,6 @@
 package com.grupo1.sgi_fia.controller;
 
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -11,11 +8,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.grupo1.sgi_fia.AdminSQLiteOpenHelper;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.grupo1.sgi_fia.R;
+import com.grupo1.sgi_fia.data.SgiFirebase;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 
 public class PrestamoLibroActivity extends AppCompatActivity {
 
@@ -54,7 +53,6 @@ public class PrestamoLibroActivity extends AppCompatActivity {
         String tituloLibro = obtenerTexto(etTituloLibro);
         String fechaPrestamo = obtenerTexto(etFechaPrestamo);
         String fechaLimite = obtenerTexto(etFechaLimite);
-        String estado = "Pendiente";
 
         if (nombre.isEmpty() || tituloLibro.isEmpty()
                 || fechaPrestamo.isEmpty() || fechaLimite.isEmpty()) {
@@ -62,68 +60,100 @@ public class PrestamoLibroActivity extends AppCompatActivity {
             return;
         }
 
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(
+        SgiFirebase.upsertPrestatario(this, CARNET_TEMPORAL, nombre,
+                new SgiFirebase.Callback<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        obtenerOCrearLibro(tituloLibro, documentId ->
+                                guardarPrestamo(documentId, nombre, tituloLibro, fechaPrestamo, fechaLimite));
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
+    }
+
+    private interface DocumentReady {
+        void onReady(String documentId);
+    }
+
+    private void obtenerOCrearLibro(String tituloLibro, DocumentReady callback) {
+        SgiFirebase.findFirst(
                 this,
-                AdminSQLiteOpenHelper.NOMBRE_BD,
-                null,
-                AdminSQLiteOpenHelper.VERSION_BD);
-        SQLiteDatabase db = admin.getWritableDatabase();
+                SgiFirebase.DOCUMENTOS,
+                documento -> SgiFirebase.equalsNormalized(SgiFirebase.string(documento, "tipo"), "Libro")
+                        && SgiFirebase.equalsNormalized(SgiFirebase.string(documento, "titulo"), tituloLibro),
+                new SgiFirebase.Callback<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot existente) {
+                        if (existente != null) {
+                            callback.onReady(existente.getId());
+                            return;
+                        }
 
-        int idDocumento = obtenerOCrearLibro(db, tituloLibro);
-        asegurarPrestatarioTemporal(db, nombre);
+                        Map<String, Object> documento = SgiFirebase.values();
+                        documento.put("titulo", tituloLibro);
+                        documento.put("tipo", "Libro");
+                        documento.put("isbn", "");
+                        documento.put("idioma", "");
+                        documento.put("anio", 0);
+                        documento.put("ejemplares", 1);
 
-        ContentValues prestamo = new ContentValues();
+                        SgiFirebase.add(PrestamoLibroActivity.this, SgiFirebase.DOCUMENTOS, documento,
+                                new SgiFirebase.Callback<String>() {
+                                    @Override
+                                    public void onSuccess(String id) {
+                                        callback.onReady(id);
+                                    }
+
+                                    @Override
+                                    public void onError(Exception exception) {
+                                        mostrarErrorFirebase(exception);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        mostrarErrorFirebase(exception);
+                    }
+                });
+    }
+
+    private void guardarPrestamo(
+            String documentId,
+            String nombre,
+            String tituloLibro,
+            String fechaPrestamo,
+            String fechaLimite) {
+        Map<String, Object> prestamo = SgiFirebase.values();
         prestamo.put("carnet_prestatario", CARNET_TEMPORAL);
-        prestamo.put("id_documento", idDocumento);
+        prestamo.put("nombre_prestatario", nombre);
+        prestamo.put("id_documento", documentId);
+        prestamo.put("titulo_documento", tituloLibro);
         prestamo.put("fecha_prestamo", fechaPrestamo);
         prestamo.put("fecha_limite", fechaLimite);
-        prestamo.put("estado", estado);
+        prestamo.put("estado", "Pendiente");
 
-        long resultado = db.insert("prestamos", null, prestamo);
-        db.close();
+        SgiFirebase.add(this, SgiFirebase.PRESTAMOS, prestamo, new SgiFirebase.Callback<String>() {
+            @Override
+            public void onSuccess(String id) {
+                etIdPrestamo.setText(id);
+                etNombrePrestatario.setText("");
+                etTituloLibro.setText("");
+                etFechaPrestamo.setText("");
+                etFechaLimite.setText("");
+                Toast.makeText(PrestamoLibroActivity.this,
+                        "Prestamo de libro registrado en Firebase", Toast.LENGTH_SHORT).show();
+            }
 
-        if (resultado == -1) {
-            Toast.makeText(this, "No se pudo registrar el prestamo", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        etIdPrestamo.setText(String.valueOf(resultado));
-        etNombrePrestatario.setText("");
-        Toast.makeText(this, "Prestamo de libro registrado", Toast.LENGTH_SHORT).show();
-    }
-
-    private int obtenerOCrearLibro(SQLiteDatabase db, String tituloLibro) {
-        Cursor cursor = db.rawQuery(
-                "SELECT id_documento FROM documentos WHERE titulo=? AND tipo=? LIMIT 1",
-                new String[]{tituloLibro, "Libro"});
-
-        if (cursor.moveToFirst()) {
-            int idDocumento = cursor.getInt(0);
-            cursor.close();
-            return idDocumento;
-        }
-        cursor.close();
-
-        ContentValues documento = new ContentValues();
-        documento.put("titulo", tituloLibro);
-        documento.put("tipo", "Libro");
-        documento.put("isbn", "");
-        documento.put("idioma", "");
-        documento.put("anio", 0);
-        documento.put("ejemplares", 1);
-
-        return (int) db.insert("documentos", null, documento);
-    }
-
-    private void asegurarPrestatarioTemporal(SQLiteDatabase db, String nombre) {
-        ContentValues prestatario = new ContentValues();
-        prestatario.put("carnet", CARNET_TEMPORAL);
-        prestatario.put("nombre", nombre);
-        db.insertWithOnConflict(
-                "prestatarios",
-                null,
-                prestatario,
-                SQLiteDatabase.CONFLICT_IGNORE);
+            @Override
+            public void onError(Exception exception) {
+                mostrarErrorFirebase(exception);
+            }
+        });
     }
 
     private void mostrarSelectorFecha(EditText campoFecha) {
@@ -131,11 +161,16 @@ public class PrestamoLibroActivity extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> campoFecha.setText(
-                        String.format(Locale.US, "%02d/%02d/%04d", dayOfMonth, month + 1, year)),
+                        String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth)),
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH));
         dialog.show();
+    }
+
+    private void mostrarErrorFirebase(Exception exception) {
+        Toast.makeText(this, "No se pudo guardar en Firebase: " + exception.getMessage(),
+                Toast.LENGTH_LONG).show();
     }
 
     private String obtenerTexto(EditText editText) {

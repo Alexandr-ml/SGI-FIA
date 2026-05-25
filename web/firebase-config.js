@@ -7,7 +7,3 @@ export const firebaseConfig = {
   appId: "1:607923927954:web:b597bfe53ceb2d5ca41f4b",
   measurementId: "G-FV4TZQ8NVP"
 };
-
-export const firebaseOptions = {
-  enableLocalFallback: true,
-};
