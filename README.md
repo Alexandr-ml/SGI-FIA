@@ -14,3 +14,6 @@
 
 La base principal actual es Firebase/Firestore en el proyecto `pdm-ues`.
 El script SQLite queda como respaldo documental de la estructura local equivalente.
+
+
+https://pdm-ues.web.app/
