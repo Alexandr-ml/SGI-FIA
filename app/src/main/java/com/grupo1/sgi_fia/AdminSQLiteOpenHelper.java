@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
-    // 🛠️ Mantenemos tu constructor original idéntico para que no te falle ninguna otra Activity
+
     public AdminSQLiteOpenHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -38,7 +38,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "anio INTEGER, " +
                 "ejemplares INTEGER)");
 
-        // 4. Tabla de Hardware (🔥 POTENCIADA: Con los requerimientos nuevos de la FIA)
+        // 4. Tabla de Hardware
         db.execSQL("CREATE TABLE hardware (" +
                 "id_hardware INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "numero_serie TEXT UNIQUE, " + // UNIQUE para evitar que clonen series
@@ -54,7 +54,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "descripcion TEXT, " +
                 "fecha_levantamiento TEXT)");
 
-        // 5. Tabla de Préstamos (🔥 MEJORADA: Con tipos de préstamo y horarios FIA)
+        // 5. Tabla de Préstamos
         db.execSQL("CREATE TABLE prestamos (" +
                 "id_prestamo INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "carnet_prestatario TEXT, " +
